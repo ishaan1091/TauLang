@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"jsonparser/cmd/jsonparser/io"
+	"jsonparser/cmd/jsonparser/lexer"
 	"log"
 	"os"
 )
@@ -15,5 +16,14 @@ func main() {
 		io.OutputFatalErrorAndExit(logger, err)
 	}
 
+	tokens, err := lexer.Tokenize(content)
+	if err != nil {
+		io.OutputFatalErrorAndExit(logger, err)
+	}
+
 	fmt.Println(content)
+
+	for _, t := range tokens {
+		fmt.Printf("%+v\n", *t)
+	}
 }

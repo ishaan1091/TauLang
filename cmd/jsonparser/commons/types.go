@@ -1,14 +1,24 @@
 package commons
 
-type DataType string
+type TokenType string
 
 const (
-	STRING  DataType = "STRING"
-	INTEGER DataType = "INTEGER"
-	BOOLEAN DataType = "BOOLEAN"
+	STRING  TokenType = "STRING"
+	INTEGER TokenType = "INTEGER"
+	BOOLEAN TokenType = "BOOLEAN"
+
+	COLON         TokenType = "COLON"
+	COMMA         TokenType = "COMMA"
+	LEFT_BRACE    TokenType = "LEFT_BRACE"
+	RIGHT_BRACE   TokenType = "RIGHT_BRACE"
+	LEFT_BRACKET  TokenType = "LEFT_BRACKET"
+	RIGHT_BRACKET TokenType = "RIGHT_BRACKET"
+
+	EOF     TokenType = "EOF"
+	ILLEGAL TokenType = "ILLEGAL"
 )
 
 type Token struct {
-	Value string
-	Type  DataType
+	Type    TokenType
+	Literal string
 }
