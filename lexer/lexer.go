@@ -64,6 +64,7 @@ func (l *lexer) NextToken() (commons.Token, error) {
 		token = newToken(commons.DIVISION, "/")
 	case '"':
 		// token = newToken(commons.STRING, l.readString())
+		token = newToken(commons.ILLEGAL, "")
 	case 0:
 		token = newToken(commons.EOF, "")
 	default:
