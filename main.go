@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"jsonparser/cmd/jsonparser/io"
-	"jsonparser/cmd/jsonparser/lexer"
 	"log"
 	"os"
+	"taulang/io"
+	"taulang/lexer"
 )
 
 func main() {
@@ -16,14 +16,18 @@ func main() {
 		io.OutputFatalErrorAndExit(logger, err)
 	}
 
-	tokens, err := lexer.Tokenize(content)
-	if err != nil {
-		io.OutputFatalErrorAndExit(logger, err)
+	l := lexer.NewLexer(content)
+
+	for {
+		token, err := l.NextToken()
+		if err != nil {
+			io.OutputFatalErrorAndExit(logger, err)
+		}
+		if token.Type == "EOF" {
+			break
+		}
+		fmt.Printf("%+v\n", token)
 	}
 
 	fmt.Println(content)
-
-	for _, t := range tokens {
-		fmt.Printf("%+v\n", *t)
-	}
 }
