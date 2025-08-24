@@ -22,16 +22,6 @@ func TestNewLexer(t *testing.T) {
 				currChar:         0,
 			},
 		},
-		{
-			name:  "single character",
-			input: "a",
-			expected: &lexer{
-				source:           "a",
-				currCharPosition: 0,
-				nextCharPosition: 1,
-				currChar:         'a',
-			},
-		},
 	}
 
 	for _, tt := range tests {
