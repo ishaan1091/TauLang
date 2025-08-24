@@ -1,8 +1,11 @@
 build:
 	go build -o bin/taulang .
 
+build-check:
+	go build -v ./...
+
 clean:
-	rm -rf ./bin
+	rm -rf ./bin && rm -f coverage.out coverage.html
 
 test:
 	go test -v ./...
