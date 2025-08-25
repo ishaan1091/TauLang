@@ -66,3 +66,10 @@ var Keywords = map[string]TokenType{
 	"rok_diye":             BREAK,
 	"jaan_de":              CONTINUE,
 }
+
+func LookupIdentifier(ident string) TokenType {
+	if tok, ok := Keywords[ident]; ok {
+		return tok
+	}
+	return IDENTIFIER
+}
