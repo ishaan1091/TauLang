@@ -3,12 +3,12 @@ package lexer
 import (
 	"errors"
 	"taulang/commons"
+	"unicode"
 	"unicode/utf8"
 )
 
 type Lexer interface {
 	NextToken() (commons.Token, error)
-	Peek() (commons.Token, error)
 }
 
 type lexer struct {
@@ -25,6 +25,7 @@ func NewLexer(input string) *lexer {
 		nextCharPosition: 0,
 		currChar:         0,
 	}
+	l.readNextChar()
 	return &l
 }
 
@@ -63,33 +64,60 @@ func (l *lexer) NextToken() (commons.Token, error) {
 	case '/':
 		token = newToken(commons.DIVISION, "/")
 	case '"':
-		// token = newToken(commons.STRING, l.readString())
-		token = newToken(commons.ILLEGAL, "")
+		// TODO: handle string literals
+		token = newToken(commons.QUOTES, "")
 	case 0:
 		token = newToken(commons.EOF, "")
 	default:
-		// handle tokenising identifiers and keywords
-		// handle boolean
-		// handle numbers
-		token = newToken(commons.ILLEGAL, "")
+		if unicode.IsLetter(l.currChar) {
+			identifier, err := l.readIdentifier()
+			if err != nil {
+				return commons.Token{}, err
+			}
+
+			tokenType := commons.LookupIdentifier(identifier)
+			token = newToken(tokenType, identifier)
+		} else if unicode.IsNumber(l.currChar) {
+			number, err := l.readNumber()
+			if err != nil {
+				return commons.Token{}, err
+			}
+			token = newToken(commons.NUMBER, number)
+		} else {
+			token = newToken(commons.ILLEGAL, string(l.currChar))
+		}
 	}
 
-	l.readNextChar()
-	l.skipWhiteSpaces()
+	err := l.readNextChar()
+	if err != nil {
+		return commons.Token{}, err
+	}
+
+	err = l.skipWhiteSpaces()
+	if err != nil {
+		return commons.Token{}, err
+	}
 
 	return token, nil
 }
 
-func (l *lexer) Peek() (commons.Token, error) {
-	return commons.Token{}, nil
-}
-
 func (l *lexer) readNextChar() error {
+	if l.nextCharPosition >= len(l.source) {
+		l.currChar = 0
+		return nil
+	}
+	runeValue, width, err := l.decodeNextChar()
+	if err != nil {
+		return err
+	}
+	l.currChar = runeValue
+	l.currCharPosition = l.nextCharPosition
+	l.nextCharPosition += width
 	return nil
 }
 
 func (l *lexer) skipWhiteSpaces() error {
-	for l.currChar == ' ' || l.currChar == '\t' || l.currChar == '\n' || l.currChar == '\r' {
+	for unicode.IsSpace(l.currChar) {
 		if err := l.readNextChar(); err != nil {
 			return err
 		}
@@ -97,9 +125,33 @@ func (l *lexer) skipWhiteSpaces() error {
 	return nil
 }
 
+func (l *lexer) readIdentifier() (string, error) {
+	var identifier []rune
+	for unicode.IsLetter(l.currChar) || unicode.IsNumber(l.currChar) || l.currChar == '_' {
+		identifier = append(identifier, l.currChar)
+		if err := l.readNextChar(); err != nil {
+			return "", err
+		}
+	}
+	return string(identifier), nil
+}
+
+func (l *lexer) readNumber() (string, error) {
+	var number []rune
+	for unicode.IsNumber(l.currChar) || l.currChar == '.' {
+		number = append(number, l.currChar)
+		if err := l.readNextChar(); err != nil {
+			return "", err
+		}
+	}
+	return string(number), nil
+}
+
 func (l *lexer) readEqualsOrDefaultToken(compoundType commons.TokenType, defaultType commons.TokenType) commons.Token {
 	if nextChar, _, err := l.decodeNextChar(); err == nil && nextChar == '=' {
-		return newToken(compoundType, string(l.currChar)+string(nextChar))
+		currChar := l.currChar
+		l.readNextChar()
+		return newToken(compoundType, string(currChar)+string(nextChar))
 	}
 	return newToken(defaultType, string(l.currChar))
 }
