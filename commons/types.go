@@ -5,6 +5,7 @@ type TokenType string
 const (
 	// identifiers + literals
 	NUMBER     TokenType = "NUMBER"
+	STRING     TokenType = "STRING"
 	IDENTIFIER TokenType = "IDENTIFIER"
 
 	// operators

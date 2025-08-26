@@ -7,6 +7,8 @@ import (
 	"unicode/utf8"
 )
 
+const EOF = rune(0)
+
 type Lexer interface {
 	NextToken() (commons.Token, error)
 }
@@ -18,7 +20,7 @@ type lexer struct {
 	currChar         rune
 }
 
-func NewLexer(input string) *lexer {
+func NewLexer(input string) Lexer {
 	l := lexer{
 		source:           input,
 		currCharPosition: 0,
@@ -64,9 +66,12 @@ func (l *lexer) NextToken() (commons.Token, error) {
 	case '/':
 		token = newToken(commons.DIVISION, "/")
 	case '"':
-		// TODO: handle string literals
-		token = newToken(commons.QUOTES, "")
-	case 0:
+		stringLiteral, err := l.readString()
+		if err != nil {
+			return commons.Token{}, err
+		}
+		token = newToken(commons.STRING, stringLiteral)
+	case EOF:
 		token = newToken(commons.EOF, "")
 	default:
 		if unicode.IsLetter(l.currChar) {
@@ -88,12 +93,12 @@ func (l *lexer) NextToken() (commons.Token, error) {
 		}
 	}
 
-	err := l.readNextChar()
+	err := l.skipWhiteSpaces()
 	if err != nil {
 		return commons.Token{}, err
 	}
 
-	err = l.skipWhiteSpaces()
+	err = l.readNextChar()
 	if err != nil {
 		return commons.Token{}, err
 	}
@@ -103,7 +108,7 @@ func (l *lexer) NextToken() (commons.Token, error) {
 
 func (l *lexer) readNextChar() error {
 	if l.nextCharPosition >= len(l.source) {
-		l.currChar = 0
+		l.currChar = EOF
 		return nil
 	}
 	runeValue, width, err := l.decodeNextChar()
@@ -138,13 +143,36 @@ func (l *lexer) readIdentifier() (string, error) {
 
 func (l *lexer) readNumber() (string, error) {
 	var number []rune
+	dotSeen := false
 	for unicode.IsNumber(l.currChar) || l.currChar == '.' {
 		number = append(number, l.currChar)
+		if l.currChar == '.' {
+			if dotSeen {
+				return "", errors.New("invalid number")
+			}
+			dotSeen = true
+		}
 		if err := l.readNextChar(); err != nil {
 			return "", err
 		}
 	}
 	return string(number), nil
+}
+
+func (l *lexer) readString() (string, error) {
+	var str []rune
+	escaped := false
+	for {
+		if err := l.readNextChar(); err != nil {
+			return "", err
+		}
+		if l.currChar == '"' && !escaped {
+			break
+		}
+		str = append(str, l.currChar)
+		escaped = (l.currChar == '\\')
+	}
+	return string(str), nil
 }
 
 func (l *lexer) readEqualsOrDefaultToken(compoundType commons.TokenType, defaultType commons.TokenType) commons.Token {
