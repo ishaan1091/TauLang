@@ -11,11 +11,15 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "", 0)
 	filepath := io.ReadArgs()
-	content, err := io.GetContent(filepath)
+	content, err := io.GetContentFromFilepath(filepath)
 	if err != nil {
 		io.OutputFatalErrorAndExit(logger, err)
 	}
 
+	// TODO: Implement REPL if no filepath is given
+	// TODO: Move execution logic to another file
+
+	// Lexical Analysis
 	l := lexer.NewLexer(content)
 
 	for {

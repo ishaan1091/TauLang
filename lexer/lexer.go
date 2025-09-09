@@ -93,12 +93,12 @@ func (l *lexer) NextToken() (commons.Token, error) {
 		}
 	}
 
-	err := l.skipWhiteSpaces()
+	err := l.readNextChar()
 	if err != nil {
 		return commons.Token{}, err
 	}
 
-	err = l.readNextChar()
+	err = l.skipWhiteSpaces()
 	if err != nil {
 		return commons.Token{}, err
 	}
@@ -134,6 +134,11 @@ func (l *lexer) readIdentifier() (string, error) {
 	var identifier []rune
 	for unicode.IsLetter(l.currChar) || unicode.IsNumber(l.currChar) || l.currChar == '_' {
 		identifier = append(identifier, l.currChar)
+
+		if nextChar, _, err := l.decodeNextChar(); err == nil && !unicode.IsLetter(nextChar) && !unicode.IsNumber(nextChar) && nextChar != '_' {
+			break
+		}
+
 		if err := l.readNextChar(); err != nil {
 			return "", err
 		}
@@ -146,12 +151,18 @@ func (l *lexer) readNumber() (string, error) {
 	dotSeen := false
 	for unicode.IsNumber(l.currChar) || l.currChar == '.' {
 		number = append(number, l.currChar)
+
 		if l.currChar == '.' {
 			if dotSeen {
 				return "", errors.New("invalid number")
 			}
 			dotSeen = true
 		}
+
+		if nextChar, _, err := l.decodeNextChar(); err == nil && !unicode.IsNumber(nextChar) && nextChar != '.' {
+			break
+		}
+
 		if err := l.readNextChar(); err != nil {
 			return "", err
 		}

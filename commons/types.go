@@ -66,6 +66,7 @@ var Keywords = map[string]TokenType{
 	"jab_tak":              WHILE,
 	"rok_diye":             BREAK,
 	"jaan_de":              CONTINUE,
+	"ne_bana_diye":         ASSIGNMENT,
 }
 
 func LookupIdentifier(ident string) TokenType {

@@ -2,7 +2,6 @@ package io
 
 import (
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -20,7 +19,7 @@ func ReadArgs() string {
 	return filepath
 }
 
-func GetContent(filepath string) (string, error) {
+func GetContentFromFilepath(filepath string) (string, error) {
 	// Read from filepath if given
 	if filepath != "" {
 		content, err := os.ReadFile(filepath)
@@ -31,10 +30,5 @@ func GetContent(filepath string) (string, error) {
 		return string(content), err
 	}
 
-	// Else read from standard input
-	content, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		return "", fmt.Errorf("failed to read from stdin: %v", err)
-	}
-	return string(content), nil
+	return "", nil
 }
