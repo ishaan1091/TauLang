@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"taulang/io"
-	"taulang/lexer"
+	"taulang/repl"
 )
 
 func main() {
@@ -16,22 +15,9 @@ func main() {
 		io.OutputFatalErrorAndExit(logger, err)
 	}
 
-	// TODO: Implement REPL if no filepath is given
-	// TODO: Move execution logic to another file
-
-	// Lexical Analysis
-	l := lexer.NewLexer(content)
-
-	for {
-		token, err := l.NextToken()
-		if err != nil {
-			io.OutputFatalErrorAndExit(logger, err)
-		}
-		if token.Type == "EOF" {
-			break
-		}
-		fmt.Printf("%+v\n", token)
+	if content != "" {
+		repl.ExecuteInput(content, logger)
+	} else {
+		repl.StartREPL(logger)
 	}
-
-	fmt.Println(content)
 }
