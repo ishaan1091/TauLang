@@ -1,4 +1,4 @@
-package commons
+package token
 
 import (
 	"testing"

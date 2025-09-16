@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"errors"
-	"taulang/commons"
+	"taulang/token"
 	"unicode"
 	"unicode/utf8"
 )
@@ -10,7 +10,7 @@ import (
 const EOF = rune(0)
 
 type Lexer interface {
-	NextToken() (commons.Token, error)
+	NextToken() (token.Token, error)
 }
 
 type lexer struct {
@@ -32,82 +32,82 @@ func NewLexer(input string) Lexer {
 	return &l
 }
 
-func (l *lexer) NextToken() (commons.Token, error) {
-	var token commons.Token
+func (l *lexer) NextToken() (token.Token, error) {
+	var tok token.Token
 
 	switch l.currChar {
 	case '{':
-		token = commons.NewToken(commons.LEFT_BRACE, "{")
+		tok = token.NewToken(token.LEFT_BRACE, "{")
 	case '}':
-		token = commons.NewToken(commons.RIGHT_BRACE, "}")
+		tok = token.NewToken(token.RIGHT_BRACE, "}")
 	case '[':
-		token = commons.NewToken(commons.LEFT_BRACKET, "[")
+		tok = token.NewToken(token.LEFT_BRACKET, "[")
 	case ']':
-		token = commons.NewToken(commons.RIGHT_BRACKET, "]")
+		tok = token.NewToken(token.RIGHT_BRACKET, "]")
 	case '(':
-		token = commons.NewToken(commons.LEFT_PAREN, "(")
+		tok = token.NewToken(token.LEFT_PAREN, "(")
 	case ')':
-		token = commons.NewToken(commons.RIGHT_PAREN, ")")
+		tok = token.NewToken(token.RIGHT_PAREN, ")")
 	case ':':
-		token = commons.NewToken(commons.COLON, ":")
+		tok = token.NewToken(token.COLON, ":")
 	case ',':
-		token = commons.NewToken(commons.COMMA, ",")
+		tok = token.NewToken(token.COMMA, ",")
 	case ';':
-		token = commons.NewToken(commons.SEMICOLON, ";")
+		tok = token.NewToken(token.SEMICOLON, ";")
 	case '=':
-		token = l.readEqualsOrDefaultToken(commons.EQUALS, commons.ILLEGAL)
+		tok = l.readEqualsOrDefaultToken(token.EQUALS, token.ILLEGAL)
 	case '!':
-		token = l.readEqualsOrDefaultToken(commons.NOT_EQUALS, commons.BANG)
+		tok = l.readEqualsOrDefaultToken(token.NOT_EQUALS, token.BANG)
 	case '>':
-		token = l.readEqualsOrDefaultToken(commons.GREATER_EQUALS, commons.GREATER_THAN)
+		tok = l.readEqualsOrDefaultToken(token.GREATER_EQUALS, token.GREATER_THAN)
 	case '<':
-		token = l.readEqualsOrDefaultToken(commons.LESSER_EQUALS, commons.LESSER_THAN)
+		tok = l.readEqualsOrDefaultToken(token.LESSER_EQUALS, token.LESSER_THAN)
 	case '+':
-		token = commons.NewToken(commons.ADDITION, "+")
+		tok = token.NewToken(token.ADDITION, "+")
 	case '-':
-		token = commons.NewToken(commons.SUBTRACTION, "-")
+		tok = token.NewToken(token.SUBTRACTION, "-")
 	case '*':
-		token = commons.NewToken(commons.MULTIPLICATION, "*")
+		tok = token.NewToken(token.MULTIPLICATION, "*")
 	case '/':
-		token = commons.NewToken(commons.DIVISION, "/")
+		tok = token.NewToken(token.DIVISION, "/")
 	case '"':
 		stringLiteral, err := l.readString()
 		if err != nil {
-			return commons.Token{}, err
+			return token.Token{}, err
 		}
-		token = commons.NewToken(commons.STRING, stringLiteral)
+		tok = token.NewToken(token.STRING, stringLiteral)
 	case EOF:
-		token = commons.NewToken(commons.EOF, "")
+		tok = token.NewToken(token.EOF, "")
 	default:
 		if unicode.IsLetter(l.currChar) {
 			identifier, err := l.readIdentifier()
 			if err != nil {
-				return commons.Token{}, err
+				return token.Token{}, err
 			}
 
-			token = commons.GetTokenForIdentifierOrKeyword(identifier)
+			tok = token.GetTokenForIdentifierOrKeyword(identifier)
 		} else if unicode.IsNumber(l.currChar) {
 			number, err := l.readNumber()
 			if err != nil {
-				return commons.Token{}, err
+				return token.Token{}, err
 			}
-			token = commons.NewToken(commons.NUMBER, number)
+			tok = token.NewToken(token.NUMBER, number)
 		} else {
-			token = commons.NewToken(commons.ILLEGAL, string(l.currChar))
+			tok = token.NewToken(token.ILLEGAL, string(l.currChar))
 		}
 	}
 
 	err := l.readNextChar()
 	if err != nil {
-		return commons.Token{}, err
+		return token.Token{}, err
 	}
 
 	err = l.skipWhiteSpaces()
 	if err != nil {
-		return commons.Token{}, err
+		return token.Token{}, err
 	}
 
-	return token, nil
+	return tok, nil
 }
 
 func (l *lexer) readNextChar() error {
@@ -190,13 +190,13 @@ func (l *lexer) readString() (string, error) {
 	return string(str), nil
 }
 
-func (l *lexer) readEqualsOrDefaultToken(compoundType commons.TokenType, defaultType commons.TokenType) commons.Token {
+func (l *lexer) readEqualsOrDefaultToken(compoundType token.TokenType, defaultType token.TokenType) token.Token {
 	if nextChar, _, err := l.decodeNextChar(); err == nil && nextChar == '=' {
 		currChar := l.currChar
 		l.readNextChar()
-		return commons.NewToken(compoundType, string(currChar)+string(nextChar))
+		return token.NewToken(compoundType, string(currChar)+string(nextChar))
 	}
-	return commons.NewToken(defaultType, string(l.currChar))
+	return token.NewToken(defaultType, string(l.currChar))
 }
 
 func (l *lexer) decodeNextChar() (rune, int, error) {

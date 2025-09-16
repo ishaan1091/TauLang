@@ -1,4 +1,4 @@
-package commons
+package token
 
 type TokenType string
 
