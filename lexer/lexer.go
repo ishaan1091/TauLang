@@ -28,6 +28,7 @@ func NewLexer(input string) Lexer {
 		currChar:         0,
 	}
 	l.readNextChar()
+	l.skipWhiteSpaces()
 	return &l
 }
 
@@ -36,19 +37,23 @@ func (l *lexer) NextToken() (commons.Token, error) {
 
 	switch l.currChar {
 	case '{':
-		token = newToken(commons.LEFT_BRACE, "{")
+		token = commons.NewToken(commons.LEFT_BRACE, "{")
 	case '}':
-		token = newToken(commons.RIGHT_BRACE, "}")
+		token = commons.NewToken(commons.RIGHT_BRACE, "}")
 	case '[':
-		token = newToken(commons.LEFT_BRACKET, "[")
+		token = commons.NewToken(commons.LEFT_BRACKET, "[")
 	case ']':
-		token = newToken(commons.RIGHT_BRACKET, "]")
+		token = commons.NewToken(commons.RIGHT_BRACKET, "]")
+	case '(':
+		token = commons.NewToken(commons.LEFT_PAREN, "(")
+	case ')':
+		token = commons.NewToken(commons.RIGHT_PAREN, ")")
 	case ':':
-		token = newToken(commons.COLON, ":")
+		token = commons.NewToken(commons.COLON, ":")
 	case ',':
-		token = newToken(commons.COMMA, ",")
+		token = commons.NewToken(commons.COMMA, ",")
 	case ';':
-		token = newToken(commons.SEMICOLON, ";")
+		token = commons.NewToken(commons.SEMICOLON, ";")
 	case '=':
 		token = l.readEqualsOrDefaultToken(commons.EQUALS, commons.ILLEGAL)
 	case '!':
@@ -58,21 +63,21 @@ func (l *lexer) NextToken() (commons.Token, error) {
 	case '<':
 		token = l.readEqualsOrDefaultToken(commons.LESSER_EQUALS, commons.LESSER_THAN)
 	case '+':
-		token = newToken(commons.ADDITION, "+")
+		token = commons.NewToken(commons.ADDITION, "+")
 	case '-':
-		token = newToken(commons.SUBTRACTION, "-")
+		token = commons.NewToken(commons.SUBTRACTION, "-")
 	case '*':
-		token = newToken(commons.MULTIPLICATION, "*")
+		token = commons.NewToken(commons.MULTIPLICATION, "*")
 	case '/':
-		token = newToken(commons.DIVISION, "/")
+		token = commons.NewToken(commons.DIVISION, "/")
 	case '"':
 		stringLiteral, err := l.readString()
 		if err != nil {
 			return commons.Token{}, err
 		}
-		token = newToken(commons.STRING, stringLiteral)
+		token = commons.NewToken(commons.STRING, stringLiteral)
 	case EOF:
-		token = newToken(commons.EOF, "")
+		token = commons.NewToken(commons.EOF, "")
 	default:
 		if unicode.IsLetter(l.currChar) {
 			identifier, err := l.readIdentifier()
@@ -80,16 +85,15 @@ func (l *lexer) NextToken() (commons.Token, error) {
 				return commons.Token{}, err
 			}
 
-			tokenType := commons.LookupIdentifier(identifier)
-			token = newToken(tokenType, identifier)
+			token = commons.GetTokenForIdentifierOrKeyword(identifier)
 		} else if unicode.IsNumber(l.currChar) {
 			number, err := l.readNumber()
 			if err != nil {
 				return commons.Token{}, err
 			}
-			token = newToken(commons.NUMBER, number)
+			token = commons.NewToken(commons.NUMBER, number)
 		} else {
-			token = newToken(commons.ILLEGAL, string(l.currChar))
+			token = commons.NewToken(commons.ILLEGAL, string(l.currChar))
 		}
 	}
 
@@ -190,13 +194,9 @@ func (l *lexer) readEqualsOrDefaultToken(compoundType commons.TokenType, default
 	if nextChar, _, err := l.decodeNextChar(); err == nil && nextChar == '=' {
 		currChar := l.currChar
 		l.readNextChar()
-		return newToken(compoundType, string(currChar)+string(nextChar))
+		return commons.NewToken(compoundType, string(currChar)+string(nextChar))
 	}
-	return newToken(defaultType, string(l.currChar))
-}
-
-func newToken(tokenType commons.TokenType, literal string) commons.Token {
-	return commons.Token{Type: tokenType, Literal: literal}
+	return commons.NewToken(defaultType, string(l.currChar))
 }
 
 func (l *lexer) decodeNextChar() (rune, int, error) {

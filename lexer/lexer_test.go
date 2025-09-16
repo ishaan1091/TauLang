@@ -217,15 +217,42 @@ func TestLexer(t *testing.T) {
 }
 
 func TestLexerMultipleTokens(t *testing.T) {
-	input := `{
-  "key": "value",
-  "number": 123,
-  "array": [1, 2, 3],
-  "object": {"nestedKey": "nestedValue"},
-  "boolean": true,
-  "comparison": 5 > 3,
-  "arithmetic": 10 + 20 * 3
-}`
+	input := `
+	{
+		"key": "value",
+		"number": 123,
+		"array": [1, 2, 3],
+		"object": {"nestedKey": "nestedValue"},
+		"boolean": true,
+		"comparison": 5 > 3,
+		"arithmetic": 10 + 20 * 3
+		"nested": {"key": "value"}
+	}
+
+
+	sun_liyo_tau x ne_bana_diye 5;
+	agar_maan_lo (x > 0) {
+		laadle_ye_le x;
+	} na_toh {
+		laadle_ye_le 0;
+	}
+
+	sun_liyo_tau add ne_bana_diye rasoi_mein_bata_diye(y, z) {
+		laadle_ye_le y + z;
+	};
+
+	jab_tak (x < 10) {
+		x ne_bana_diye x + 1;
+	}
+
+	rok_diye;
+	jaan_de;
+
+	sun_liyo_tau arr ne_bana_diye [1, 2, 3, 4, 5];
+	sun_liyo_tau obj ne_bana_diye {"a": 1, "b": 2, "c": 3};
+	sun_liyo_tau bool ne_bana_diye saccha;
+	sun_liyo_tau bool ne_bana_diye jhootha;
+	`
 
 	expectedTokens := []commons.Token{
 		{Type: commons.LEFT_BRACE, Literal: "{"},
@@ -272,7 +299,113 @@ func TestLexerMultipleTokens(t *testing.T) {
 		{Type: commons.NUMBER, Literal: "20"},
 		{Type: commons.MULTIPLICATION, Literal: "*"},
 		{Type: commons.NUMBER, Literal: "3"},
+		{Type: commons.STRING, Literal: "nested"},
+		{Type: commons.COLON, Literal: ":"},
+		{Type: commons.LEFT_BRACE, Literal: "{"},
+		{Type: commons.STRING, Literal: "key"},
+		{Type: commons.COLON, Literal: ":"},
+		{Type: commons.STRING, Literal: "value"},
 		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.LET, Literal: "let"},
+		{Type: commons.IDENTIFIER, Literal: "x"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.NUMBER, Literal: "5"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.IF, Literal: "if"},
+		{Type: commons.LEFT_PAREN, Literal: "("},
+		{Type: commons.IDENTIFIER, Literal: "x"},
+		{Type: commons.GREATER_THAN, Literal: ">"},
+		{Type: commons.NUMBER, Literal: "0"},
+		{Type: commons.RIGHT_PAREN, Literal: ")"},
+		{Type: commons.LEFT_BRACE, Literal: "{"},
+		{Type: commons.RETURN, Literal: "return"},
+		{Type: commons.IDENTIFIER, Literal: "x"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.ELSE, Literal: "else"},
+		{Type: commons.LEFT_BRACE, Literal: "{"},
+		{Type: commons.RETURN, Literal: "return"},
+		{Type: commons.NUMBER, Literal: "0"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.LET, Literal: "let"},
+		{Type: commons.IDENTIFIER, Literal: "add"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.FUNCTION, Literal: "func"},
+		{Type: commons.LEFT_PAREN, Literal: "("},
+		{Type: commons.IDENTIFIER, Literal: "y"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.IDENTIFIER, Literal: "z"},
+		{Type: commons.RIGHT_PAREN, Literal: ")"},
+		{Type: commons.LEFT_BRACE, Literal: "{"},
+		{Type: commons.RETURN, Literal: "return"},
+		{Type: commons.IDENTIFIER, Literal: "y"},
+		{Type: commons.ADDITION, Literal: "+"},
+		{Type: commons.IDENTIFIER, Literal: "z"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.WHILE, Literal: "while"},
+		{Type: commons.LEFT_PAREN, Literal: "("},
+		{Type: commons.IDENTIFIER, Literal: "x"},
+		{Type: commons.LESSER_THAN, Literal: "<"},
+		{Type: commons.NUMBER, Literal: "10"},
+		{Type: commons.RIGHT_PAREN, Literal: ")"},
+		{Type: commons.LEFT_BRACE, Literal: "{"},
+		{Type: commons.IDENTIFIER, Literal: "x"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.IDENTIFIER, Literal: "x"},
+		{Type: commons.ADDITION, Literal: "+"},
+		{Type: commons.NUMBER, Literal: "1"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.BREAK, Literal: "break"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.CONTINUE, Literal: "continue"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.LET, Literal: "let"},
+		{Type: commons.IDENTIFIER, Literal: "arr"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.LEFT_BRACKET, Literal: "["},
+		{Type: commons.NUMBER, Literal: "1"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.NUMBER, Literal: "2"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.NUMBER, Literal: "3"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.NUMBER, Literal: "4"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.NUMBER, Literal: "5"},
+		{Type: commons.RIGHT_BRACKET, Literal: "]"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.LET, Literal: "let"},
+		{Type: commons.IDENTIFIER, Literal: "obj"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.LEFT_BRACE, Literal: "{"},
+		{Type: commons.STRING, Literal: "a"},
+		{Type: commons.COLON, Literal: ":"},
+		{Type: commons.NUMBER, Literal: "1"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.STRING, Literal: "b"},
+		{Type: commons.COLON, Literal: ":"},
+		{Type: commons.NUMBER, Literal: "2"},
+		{Type: commons.COMMA, Literal: ","},
+		{Type: commons.STRING, Literal: "c"},
+		{Type: commons.COLON, Literal: ":"},
+		{Type: commons.NUMBER, Literal: "3"},
+		{Type: commons.RIGHT_BRACE, Literal: "}"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.LET, Literal: "let"},
+		{Type: commons.IDENTIFIER, Literal: "bool"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.TRUE, Literal: "true"},
+		{Type: commons.SEMICOLON, Literal: ";"},
+		{Type: commons.LET, Literal: "let"},
+		{Type: commons.IDENTIFIER, Literal: "bool"},
+		{Type: commons.ASSIGNMENT, Literal: "="},
+		{Type: commons.FALSE, Literal: "false"},
+		{Type: commons.SEMICOLON, Literal: ";"},
 		{Type: commons.EOF, Literal: ""},
 	}
 
@@ -280,6 +413,9 @@ func TestLexerMultipleTokens(t *testing.T) {
 
 	for i, expectedToken := range expectedTokens {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			if i == 99 {
+				t.Log(expectedToken)
+			}
 			token, err := l.NextToken()
 			assert.NoError(t, err)
 			assert.Equal(t, expectedToken, token)

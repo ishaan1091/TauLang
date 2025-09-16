@@ -45,7 +45,10 @@ const (
 	RIGHT_BRACE   TokenType = "RIGHT_BRACE"   // }
 	LEFT_BRACKET  TokenType = "LEFT_BRACKET"  // [
 	RIGHT_BRACKET TokenType = "RIGHT_BRACKET" // ]
+	LEFT_PAREN    TokenType = "LEFT_PAREN"    // (
+	RIGHT_PAREN   TokenType = "RIGHT_PAREN"   // )
 
+	// special tokens
 	EOF     TokenType = "EOF"
 	ILLEGAL TokenType = "ILLEGAL"
 )
@@ -69,9 +72,27 @@ var Keywords = map[string]TokenType{
 	"ne_bana_diye":         ASSIGNMENT,
 }
 
-func LookupIdentifier(ident string) TokenType {
-	if tok, ok := Keywords[ident]; ok {
-		return tok
+var ReverseKeywords = map[TokenType]string{
+	LET:        "let",
+	FUNCTION:   "func",
+	IF:         "if",
+	ELSE:       "else",
+	RETURN:     "return",
+	TRUE:       "true",
+	FALSE:      "false",
+	WHILE:      "while",
+	BREAK:      "break",
+	CONTINUE:   "continue",
+	ASSIGNMENT: "=",
+}
+
+func GetTokenForIdentifierOrKeyword(value string) Token {
+	if tok, ok := Keywords[value]; ok {
+		return NewToken(tok, ReverseKeywords[tok])
 	}
-	return IDENTIFIER
+	return NewToken(IDENTIFIER, value)
+}
+
+func NewToken(tokenType TokenType, literal string) Token {
+	return Token{Type: tokenType, Literal: literal}
 }
