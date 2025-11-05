@@ -33,7 +33,10 @@ func StartREPL(logger *log.Logger) {
 
 func ExecuteInput(input string, logger *log.Logger) {
 	// Lexical Analysis
-	l := lexer.NewLexer(input)
+	l, err := lexer.NewLexer(input)
+	if err != nil {
+		io.OutputFatalErrorAndExit(logger, err)
+	}
 
 	for {
 		token, err := l.NextToken()

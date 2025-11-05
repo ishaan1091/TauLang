@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"errors"
+	"fmt"
 	"taulang/token"
 	"unicode"
 	"unicode/utf8"
@@ -20,16 +21,23 @@ type lexer struct {
 	currChar         rune
 }
 
-func NewLexer(input string) Lexer {
+func NewLexer(input string) (Lexer, error) {
 	l := lexer{
 		source:           input,
 		currCharPosition: 0,
 		nextCharPosition: 0,
 		currChar:         0,
 	}
-	l.readNextChar()
-	l.skipWhiteSpaces()
-	return &l
+
+	if err := l.readNextChar(); err != nil {
+		return nil, fmt.Errorf("failed to read first char: %w", err)
+	}
+
+	if err := l.skipWhiteSpaces(); err != nil {
+		return nil, err
+	}
+
+	return &l, nil
 }
 
 func (l *lexer) NextToken() (token.Token, error) {
@@ -55,13 +63,29 @@ func (l *lexer) NextToken() (token.Token, error) {
 	case ';':
 		tok = token.NewToken(token.SEMICOLON, ";")
 	case '=':
-		tok = l.readEqualsOrDefaultToken(token.EQUALS, token.ILLEGAL)
+		t, err := l.readEqualsOrDefaultToken(token.EQUALS, token.ILLEGAL)
+		if err != nil {
+			return t, err
+		}
+		tok = t
 	case '!':
-		tok = l.readEqualsOrDefaultToken(token.NOT_EQUALS, token.BANG)
+		t, err := l.readEqualsOrDefaultToken(token.NOT_EQUALS, token.BANG)
+		if err != nil {
+			return t, err
+		}
+		tok = t
 	case '>':
-		tok = l.readEqualsOrDefaultToken(token.GREATER_EQUALS, token.GREATER_THAN)
+		t, err := l.readEqualsOrDefaultToken(token.GREATER_EQUALS, token.GREATER_THAN)
+		if err != nil {
+			return t, err
+		}
+		tok = t
 	case '<':
-		tok = l.readEqualsOrDefaultToken(token.LESSER_EQUALS, token.LESSER_THAN)
+		t, err := l.readEqualsOrDefaultToken(token.LESSER_EQUALS, token.LESSER_THAN)
+		if err != nil {
+			return t, err
+		}
+		tok = t
 	case '+':
 		tok = token.NewToken(token.ADDITION, "+")
 	case '-':
@@ -185,18 +209,21 @@ func (l *lexer) readString() (string, error) {
 			break
 		}
 		str = append(str, l.currChar)
-		escaped = (l.currChar == '\\')
+		escaped = l.currChar == '\\'
 	}
 	return string(str), nil
 }
 
-func (l *lexer) readEqualsOrDefaultToken(compoundType token.TokenType, defaultType token.TokenType) token.Token {
+func (l *lexer) readEqualsOrDefaultToken(compoundType token.Type, defaultType token.Type) (token.Token, error) {
 	if nextChar, _, err := l.decodeNextChar(); err == nil && nextChar == '=' {
 		currChar := l.currChar
-		l.readNextChar()
-		return token.NewToken(compoundType, string(currChar)+string(nextChar))
+		err := l.readNextChar()
+		if err != nil {
+			return token.Token{}, err
+		}
+		return token.NewToken(compoundType, string(currChar)+string(nextChar)), nil
 	}
-	return token.NewToken(defaultType, string(l.currChar))
+	return token.NewToken(defaultType, string(l.currChar)), nil
 }
 
 func (l *lexer) decodeNextChar() (rune, int, error) {

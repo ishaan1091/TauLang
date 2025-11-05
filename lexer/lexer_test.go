@@ -48,7 +48,8 @@ func TestNewLexer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := NewLexer(tt.input)
+			l, err := NewLexer(tt.input)
+			assert.NoError(t, err)
 			assert.Equal(t, tt.expected, l)
 		})
 	}
@@ -208,10 +209,11 @@ func TestLexer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			l := NewLexer(tt.input)
-			token, err := l.NextToken()
+			l, err := NewLexer(tt.input)
 			assert.NoError(t, err)
-			assert.Equal(t, tt.expected, token)
+			tok, err := l.NextToken()
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expected, tok)
 		})
 	}
 }
@@ -409,16 +411,17 @@ func TestLexerMultipleTokens(t *testing.T) {
 		{Type: token.EOF, Literal: ""},
 	}
 
-	l := NewLexer(input)
+	l, err := NewLexer(input)
+	assert.NoError(t, err)
 
 	for i, expectedToken := range expectedTokens {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			if i == 99 {
 				t.Log(expectedToken)
 			}
-			token, err := l.NextToken()
+			tok, err := l.NextToken()
 			assert.NoError(t, err)
-			assert.Equal(t, expectedToken, token)
+			assert.Equal(t, expectedToken, tok)
 		})
 	}
 }

@@ -1,64 +1,63 @@
 package token
 
-type TokenType string
+type Type string
 
 const (
 	// identifiers + literals
-	NUMBER     TokenType = "NUMBER"
-	STRING     TokenType = "STRING"
-	IDENTIFIER TokenType = "IDENTIFIER"
+	NUMBER     Type = "NUMBER"
+	STRING     Type = "STRING"
+	IDENTIFIER Type = "IDENTIFIER"
 
 	// operators
-	ASSIGNMENT     TokenType = "ASSIGNMENT"     // ne_bana_diye
-	BANG           TokenType = "BANG"           // !
-	EQUALS         TokenType = "EQUALS"         // ==
-	NOT_EQUALS     TokenType = "NOT_EQUALS"     // !=
-	GREATER_THAN   TokenType = "GREATER_THAN"   // >
-	LESSER_THAN    TokenType = "LESSER_THAN"    // <
-	GREATER_EQUALS TokenType = "GREATER_EQUALS" // >=
-	LESSER_EQUALS  TokenType = "LESSER_EQUALS"  // <=
-	ADDITION       TokenType = "ADDITION"       // +
-	SUBTRACTION    TokenType = "SUBTRACTION"    // -
-	MULTIPLICATION TokenType = "MULTIPLICATION" // *
-	DIVISION       TokenType = "DIVISION"       // /
+	ASSIGNMENT     Type = "ASSIGNMENT"     // ne_bana_diye
+	BANG           Type = "BANG"           // !
+	EQUALS         Type = "EQUALS"         // ==
+	NOT_EQUALS     Type = "NOT_EQUALS"     // !=
+	GREATER_THAN   Type = "GREATER_THAN"   // >
+	LESSER_THAN    Type = "LESSER_THAN"    // <
+	GREATER_EQUALS Type = "GREATER_EQUALS" // >=
+	LESSER_EQUALS  Type = "LESSER_EQUALS"  // <=
+	ADDITION       Type = "ADDITION"       // +
+	SUBTRACTION    Type = "SUBTRACTION"    // -
+	MULTIPLICATION Type = "MULTIPLICATION" // *
+	DIVISION       Type = "DIVISION"       // /
 
 	// keywords
-	LET      TokenType = "LET"
-	FUNCTION TokenType = "FUNCTION"
-	IF       TokenType = "IF"
-	ELSE     TokenType = "ELSE"
-	RETURN   TokenType = "RETURN"
-	TRUE     TokenType = "TRUE"
-	FALSE    TokenType = "FALSE"
-	WHILE    TokenType = "WHILE"
-	BREAK    TokenType = "BREAK"
-	CONTINUE TokenType = "CONTINUE"
+	LET      Type = "LET"
+	FUNCTION Type = "FUNCTION"
+	IF       Type = "IF"
+	ELSE     Type = "ELSE"
+	RETURN   Type = "RETURN"
+	TRUE     Type = "TRUE"
+	FALSE    Type = "FALSE"
+	WHILE    Type = "WHILE"
+	BREAK    Type = "BREAK"
+	CONTINUE Type = "CONTINUE"
 
 	// delimiters
-	COMMA     TokenType = "COMMA"     // ,
-	SEMICOLON TokenType = "SEMICOLON" // ;
-	COLON     TokenType = "COLON"     // :
-	QUOTES    TokenType = "QUOTES"    // "
+	COMMA     Type = "COMMA"     // ,
+	SEMICOLON Type = "SEMICOLON" // ;
+	COLON     Type = "COLON"     // :
 
 	// parenthesis
-	LEFT_BRACE    TokenType = "LEFT_BRACE"    // {
-	RIGHT_BRACE   TokenType = "RIGHT_BRACE"   // }
-	LEFT_BRACKET  TokenType = "LEFT_BRACKET"  // [
-	RIGHT_BRACKET TokenType = "RIGHT_BRACKET" // ]
-	LEFT_PAREN    TokenType = "LEFT_PAREN"    // (
-	RIGHT_PAREN   TokenType = "RIGHT_PAREN"   // )
+	LEFT_BRACE    Type = "LEFT_BRACE"    // {
+	RIGHT_BRACE   Type = "RIGHT_BRACE"   // }
+	LEFT_BRACKET  Type = "LEFT_BRACKET"  // [
+	RIGHT_BRACKET Type = "RIGHT_BRACKET" // ]
+	LEFT_PAREN    Type = "LEFT_PAREN"    // (
+	RIGHT_PAREN   Type = "RIGHT_PAREN"   // )
 
 	// special tokens
-	EOF     TokenType = "EOF"
-	ILLEGAL TokenType = "ILLEGAL"
+	EOF     Type = "EOF"
+	ILLEGAL Type = "ILLEGAL"
 )
 
 type Token struct {
-	Type    TokenType
+	Type    Type
 	Literal string
 }
 
-var Keywords = map[string]TokenType{
+var Keywords = map[string]Type{
 	"sun_liyo_tau":         LET,
 	"rasoi_mein_bata_diye": FUNCTION,
 	"agar_maan_lo":         IF,
@@ -72,7 +71,7 @@ var Keywords = map[string]TokenType{
 	"ne_bana_diye":         ASSIGNMENT,
 }
 
-var ReverseKeywords = map[TokenType]string{
+var ReverseKeywords = map[Type]string{
 	LET:        "let",
 	FUNCTION:   "func",
 	IF:         "if",
@@ -93,6 +92,6 @@ func GetTokenForIdentifierOrKeyword(value string) Token {
 	return NewToken(IDENTIFIER, value)
 }
 
-func NewToken(tokenType TokenType, literal string) Token {
+func NewToken(tokenType Type, literal string) Token {
 	return Token{Type: tokenType, Literal: literal}
 }

@@ -10,7 +10,7 @@ func TestLookupIdentifier(t *testing.T) {
 	tests := []struct {
 		name            string
 		input           string
-		expected        TokenType
+		expected        Type
 		expectedLiteral string
 	}{
 		{
