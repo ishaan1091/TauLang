@@ -211,8 +211,7 @@ func TestLexer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			l, err := NewLexer(tt.input)
 			assert.NoError(t, err)
-			tok, err := l.NextToken()
-			assert.NoError(t, err)
+			tok := l.NextToken()
 			assert.Equal(t, tt.expected, tok)
 		})
 	}
@@ -419,8 +418,7 @@ func TestLexerMultipleTokens(t *testing.T) {
 			if i == 99 {
 				t.Log(expectedToken)
 			}
-			tok, err := l.NextToken()
-			assert.NoError(t, err)
+			tok := l.NextToken()
 			assert.Equal(t, expectedToken, tok)
 		})
 	}

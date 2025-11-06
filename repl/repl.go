@@ -39,10 +39,7 @@ func ExecuteInput(input string, logger *log.Logger) {
 	}
 
 	for {
-		token, err := l.NextToken()
-		if err != nil {
-			io.OutputFatalErrorAndExit(logger, err)
-		}
+		token := l.NextToken()
 		if token.Type == "EOF" {
 			break
 		}

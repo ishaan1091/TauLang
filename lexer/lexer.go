@@ -11,7 +11,7 @@ import (
 const EOF = rune(0)
 
 type Lexer interface {
-	NextToken() (token.Token, error)
+	NextToken() token.Token
 }
 
 type lexer struct {
@@ -34,13 +34,21 @@ func NewLexer(input string) (Lexer, error) {
 	}
 
 	if err := l.skipWhiteSpaces(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to skip whitespaces during initialization: %w", err)
 	}
 
 	return &l, nil
 }
 
-func (l *lexer) NextToken() (token.Token, error) {
+func (l *lexer) NextToken() token.Token {
+	tok, err := l.getNextToken()
+	if err != nil {
+		return token.NewToken(token.ILLEGAL, err.Error())
+	}
+	return tok
+}
+
+func (l *lexer) getNextToken() (token.Token, error) {
 	var tok token.Token
 
 	switch l.currChar {

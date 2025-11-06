@@ -8,7 +8,7 @@ import (
 )
 
 type Parser interface {
-	Parse() (*ast.Program, error)
+	Parse() *ast.Program
 	Errors() []string
 }
 
@@ -24,71 +24,94 @@ type parser struct {
 	currToken token.Token
 	peekToken token.Token
 
-	prefixParseFunctions map[token.Token]prefixParseFunction
-	infixParseFunctions  map[token.Token]infixParseFunction
+	prefixParseFunctions map[token.Type]prefixParseFunction
+	infixParseFunctions  map[token.Type]infixParseFunction
 }
 
-func NewParser(l lexer.Lexer) (Parser, error) {
+func NewParser(l lexer.Lexer) Parser {
 	p := parser{
 		lexer:  l,
 		errors: []string{},
 	}
 
-	p.prefixParseFunctions = make(map[token.Token]prefixParseFunction)
-	p.infixParseFunctions = make(map[token.Token]infixParseFunction)
+	p.prefixParseFunctions = make(map[token.Type]prefixParseFunction)
+	p.infixParseFunctions = make(map[token.Type]infixParseFunction)
 
 	// advancing tokens two times to populate both next and curr tokens
-	err := p.nextToken()
-	if err != nil {
-		return nil, err
-	}
-	err = p.nextToken()
-	if err != nil {
-		return nil, err
-	}
+	p.nextToken()
+	p.nextToken()
 
-	return &p, nil
+	return &p
 }
 
-func (p *parser) Parse() (*ast.Program, error) {
+func (p *parser) Parse() *ast.Program {
 	program := ast.Program{}
 
 	program.Statements = []ast.Statement{}
 
 	for p.currToken.Type != token.EOF {
-		statement, err := p.parseStatement()
-		if err != nil {
-			return nil, err
+		if statement := p.parseStatement(); statement != nil {
+			program.Statements = append(program.Statements, statement)
 		}
 
-		if statement != nil {
-			program.Statements = append(program.Statements)
-		}
-
-		err = p.nextToken()
-		if err != nil {
-			return nil, err
-		}
+		p.nextToken()
 	}
 
-	return &program, nil
+	return &program
 }
 
 func (p *parser) Errors() []string {
 	return p.errors
 }
 
-func (p *parser) nextToken() error {
+func (p *parser) nextToken() {
 	p.currToken = p.peekToken
 
-	tok, err := p.lexer.NextToken()
-	if err != nil {
-		return fmt.Errorf("got error while parsing next token: %w", err)
-	}
+	tok := p.lexer.NextToken()
 	p.peekToken = tok
-	return nil
 }
 
-func (p *parser) parseStatement() (ast.Statement, error) {
-	return nil, nil
+func (p *parser) currTokenIs(tok token.Type) bool {
+	return p.currToken.Type == tok
+}
+
+func (p *parser) peekTokenIs(tok token.Type) bool {
+	return p.peekToken.Type == tok
+}
+
+func (p *parser) expectPeekToken(tok token.Type) bool {
+	if p.peekTokenIs(tok) {
+		p.nextToken()
+		return true
+	}
+
+	p.peekTokenMismatchError(tok)
+	return false
+}
+
+func (p *parser) peekTokenMismatchError(expected token.Type) {
+	actual := p.peekToken
+	msg := fmt.Sprintf("expected next token to be %s, got %s", expected, actual.Type)
+
+	// Append token literal in case of illegal tokens to give more visibility into the error
+	if actual.Type == token.ILLEGAL && actual.Literal != "" {
+		msg += fmt.Sprintf(" (%s)", actual.Literal)
+	}
+
+	p.errors = append(p.errors, msg)
+}
+
+func (p *parser) parseStatement() ast.Statement {
+	switch p.currToken.Type {
+	case token.LET:
+		return p.parseLetStatement()
+	case token.RETURN:
+		return nil
+	default:
+		return nil
+	}
+}
+
+func (p *parser) parseLetStatement() ast.Statement {
+	return nil
 }

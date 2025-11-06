@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewParser(t *testing.T) {
+func TestParser(t *testing.T) {
 	tests := []struct {
 		name            string
 		input           string
@@ -33,11 +33,8 @@ func TestNewParser(t *testing.T) {
 			l, err := lexer.NewLexer(tc.input)
 			assert.NoError(t, err)
 
-			p, err := parser.NewParser(l)
-			assert.NoError(t, err)
-
-			program, err := p.Parse()
-			assert.NoError(t, err)
+			p := parser.NewParser(l)
+			program := p.Parse()
 
 			assert.Equal(t, tc.expectedProgram, program)
 			assert.Equal(t, tc.expectedErrors, p.Errors())
