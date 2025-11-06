@@ -4,6 +4,7 @@ import (
 	"taulang/ast"
 	"taulang/lexer"
 	"taulang/parser"
+	"taulang/token"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,11 +18,45 @@ func TestParser(t *testing.T) {
 		expectedProgram *ast.Program
 	}{
 		{
-			name:           "success",
-			input:          `let x = 5;`,
+			name:           "success - parse let simple statement",
+			input:          `sun_liyo_tau x ne_bana_diye 5;`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
-				Statements: []ast.Statement{},
+				Statements: []ast.Statement{
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						Value: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - parse let simple statement",
+			input:          `sun_liyo_tau x ne_bana_diye saccha;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						Value: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - parse let simple statement",
+			input:          `sun_liyo_tau x ne_bana_diye y;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						Value: nil,
+					},
+				},
 			},
 		},
 	}
