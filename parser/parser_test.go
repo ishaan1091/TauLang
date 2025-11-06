@@ -18,6 +18,14 @@ func TestParser(t *testing.T) {
 		expectedProgram *ast.Program
 	}{
 		{
+			name:           "failure - illegal token",
+			input:          `sun_liyo_tau x = 5;`,
+			expectedErrors: []string{"expected next token to be ASSIGNMENT, got ILLEGAL (=)"},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{},
+			},
+		},
+		{
 			name:           "success - parse let statement",
 			input:          `sun_liyo_tau x ne_bana_diye 5;`,
 			expectedErrors: []string{},
