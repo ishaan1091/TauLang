@@ -18,7 +18,7 @@ func TestParser(t *testing.T) {
 		expectedProgram *ast.Program
 	}{
 		{
-			name:           "success - parse let simple statement",
+			name:           "success - parse let statement",
 			input:          `sun_liyo_tau x ne_bana_diye 5;`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
@@ -32,7 +32,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name:           "success - parse let simple statement",
+			name:           "success - parse let statement with boolean value",
 			input:          `sun_liyo_tau x ne_bana_diye saccha;`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
@@ -46,7 +46,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name:           "success - parse let simple statement",
+			name:           "success - parse let statement with identifier value",
 			input:          `sun_liyo_tau x ne_bana_diye y;`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
@@ -55,6 +55,27 @@ func TestParser(t *testing.T) {
 						Token: token.Token{Type: token.LET, Literal: "let"},
 						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
 						Value: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "failure - parse let statement with missing identifier",
+			input:          `sun_liyo_tau ne_bana_diye x y;`,
+			expectedErrors: []string{"expected next token to be IDENTIFIER, got ASSIGNMENT"},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{},
+			},
+		},
+		{
+			name:           "success - return statement",
+			input:          `laadle_ye_le x;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ReturnStatement{
+						Token:       token.Token{Type: token.RETURN, Literal: "return"},
+						ReturnValue: nil,
 					},
 				},
 			},
