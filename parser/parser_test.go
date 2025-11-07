@@ -22,7 +22,12 @@ func TestParser(t *testing.T) {
 			input:          `sun_liyo_tau x = 5;`,
 			expectedErrors: []string{"expected next token to be ASSIGNMENT, got ILLEGAL (=)"},
 			expectedProgram: &ast.Program{
-				Statements: []ast.Statement{},
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.ILLEGAL, Literal: "="},
+						Expression: nil,
+					},
+				},
 			},
 		},
 		{
@@ -72,7 +77,12 @@ func TestParser(t *testing.T) {
 			input:          `sun_liyo_tau ne_bana_diye x y;`,
 			expectedErrors: []string{"expected next token to be IDENTIFIER, got ASSIGNMENT"},
 			expectedProgram: &ast.Program{
-				Statements: []ast.Statement{},
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.ASSIGNMENT, Literal: "="},
+						Expression: nil,
+					},
+				},
 			},
 		},
 		{
@@ -84,6 +94,101 @@ func TestParser(t *testing.T) {
 					&ast.ReturnStatement{
 						Token:       token.Token{Type: token.RETURN, Literal: "return"},
 						ReturnValue: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - function call",
+			input:          `some_func(x);`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
+						Expression: nil,
+					},
+				},
+			},
+		},
+		{
+			name: "success - expression statement - function declaration",
+			input: `
+			rasoi_mein_bata_diye some_func(x) {
+				laadle_ye_le x
+			};
+			`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.FUNCTION, Literal: "func"},
+						Expression: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - standard expression",
+			input:          `5 + 5`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
+						Expression: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - standard expression with identifier",
+			input:          `some_var + 5`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
+						Expression: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - standard expression with identifier",
+			input:          `(some_var + 5) * y`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.LEFT_PAREN, Literal: "("},
+						Expression: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - standard expression with identifier",
+			input:          `-5 + some_var + 5`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.SUBTRACTION, Literal: "-"},
+						Expression: nil,
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - standard expression with identifier",
+			input:          `-5 + some_var + 5`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.SUBTRACTION, Literal: "-"},
+						Expression: nil,
 					},
 				},
 			},
