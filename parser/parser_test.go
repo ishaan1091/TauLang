@@ -66,6 +66,20 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
+			name:           "success - parse let statement with string value",
+			input:          `sun_liyo_tau x ne_bana_diye "test";`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						Value: &ast.String{Token: token.Token{Type: token.STRING, Literal: "test"}, Value: "test"},
+					},
+				},
+			},
+		},
+		{
 			name:           "success - parse let statement with identifier value",
 			input:          `sun_liyo_tau x ne_bana_diye y;`,
 			expectedErrors: []string{},

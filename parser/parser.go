@@ -71,6 +71,17 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.FALSE] = p.parseBoolean
 	p.prefixParseFunctions[token.STRING] = p.parseString
 
+	p.infixParseFunctions[token.EQUALS] = p.parseInfixExpression
+	p.infixParseFunctions[token.NOT_EQUALS] = p.parseInfixExpression
+	p.infixParseFunctions[token.ADDITION] = p.parseInfixExpression
+	p.infixParseFunctions[token.SUBTRACTION] = p.parseInfixExpression
+	p.infixParseFunctions[token.DIVISION] = p.parseInfixExpression
+	p.infixParseFunctions[token.MULTIPLICATION] = p.parseInfixExpression
+	p.infixParseFunctions[token.LESSER_THAN] = p.parseInfixExpression
+	p.infixParseFunctions[token.LESSER_EQUALS] = p.parseInfixExpression
+	p.infixParseFunctions[token.GREATER_THAN] = p.parseInfixExpression
+	p.infixParseFunctions[token.GREATER_EQUALS] = p.parseInfixExpression
+
 	// advancing tokens two times to populate both next and curr tokens
 	p.nextToken()
 	p.nextToken()
@@ -261,6 +272,16 @@ func (p *parser) parsePrefixExpression() ast.Expression {
 	p.nextToken()
 
 	expression.Operand = p.parseExpression(PREFIX)
+
+	return &expression
+}
+
+func (p *parser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expression := ast.InfixExpression{Token: p.currToken, Left: left, Operator: p.currToken.Literal}
+
+	precedence := p.currPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence)
 
 	return &expression
 }
