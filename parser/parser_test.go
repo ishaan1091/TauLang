@@ -299,6 +299,92 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "success - if / else statement",
+			input: `
+			agar_maan_lo (x <= 3) {
+				laadle_ye_le a;
+			} na_toh {
+				laadle_ye_le b;
+			}
+			`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IF, Literal: "if"},
+						Expression: &ast.ConditionalExpression{
+							Token: token.Token{Type: token.IF, Literal: "if"},
+							Condition: &ast.InfixExpression{
+								Token:    token.Token{Type: token.LESSER_EQUALS, Literal: "<="},
+								Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+								Operator: "<=",
+								Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
+							},
+							Consequence: &ast.BlockStatement{
+								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+								Statements: []ast.Statement{
+									&ast.ReturnStatement{
+										Token:       token.Token{Type: token.RETURN, Literal: "return"},
+										ReturnValue: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "a"}, Value: "a"},
+									},
+								},
+							},
+							Alternative: &ast.BlockStatement{
+								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+								Statements: []ast.Statement{
+									&ast.ReturnStatement{
+										Token:       token.Token{Type: token.RETURN, Literal: "return"},
+										ReturnValue: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "b"}, Value: "b"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "success - if statement without else block followed by another statement",
+			input: `
+			agar_maan_lo (x <= 3) {
+				laadle_ye_le a;
+			}
+			sun_liyo_tau x ne_bana_diye 5;
+			`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IF, Literal: "if"},
+						Expression: &ast.ConditionalExpression{
+							Token: token.Token{Type: token.IF, Literal: "if"},
+							Condition: &ast.InfixExpression{
+								Token:    token.Token{Type: token.LESSER_EQUALS, Literal: "<="},
+								Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+								Operator: "<=",
+								Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
+							},
+							Consequence: &ast.BlockStatement{
+								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+								Statements: []ast.Statement{
+									&ast.ReturnStatement{
+										Token:       token.Token{Type: token.RETURN, Literal: "return"},
+										ReturnValue: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "a"}, Value: "a"},
+									},
+								},
+							},
+							Alternative: nil,
+						},
+					},
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						Value: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

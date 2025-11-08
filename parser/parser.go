@@ -72,6 +72,7 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.STRING] = p.parseString
 	p.prefixParseFunctions[token.LEFT_PAREN] = p.parseGroupedExpressions
 	p.prefixParseFunctions[token.FUNCTION] = p.parseFunctionLiteral
+	p.prefixParseFunctions[token.IF] = p.parseConditionalExpression
 
 	p.infixParseFunctions[token.EQUALS] = p.parseInfixExpression
 	p.infixParseFunctions[token.NOT_EQUALS] = p.parseInfixExpression
@@ -171,6 +172,8 @@ func (p *parser) callExpressionPeekTokenMismatchError() {
 }
 
 func (p *parser) parseStatement() ast.Statement {
+	// TODO: Implement Function statement so that we can define functions without using
+	// 		 let statements as well, like we do in golang
 	switch p.currToken.Type {
 	case token.LET:
 		return p.parseLetStatement()
@@ -403,4 +406,38 @@ func (p *parser) parseBlockStatement() *ast.BlockStatement {
 	block.Statements = statements
 
 	return &block
+}
+
+func (p *parser) parseConditionalExpression() ast.Expression {
+	expression := ast.ConditionalExpression{Token: p.currToken}
+
+	if !p.expectPeekToken(token.LEFT_PAREN) {
+		return nil
+	}
+
+	p.nextToken()
+	expression.Condition = p.parseExpression(LOWEST)
+
+	if !p.expectPeekToken(token.RIGHT_PAREN) {
+		return nil
+	}
+
+	if !p.expectPeekToken(token.LEFT_BRACE) {
+		return nil
+	}
+
+	expression.Consequence = p.parseBlockStatement()
+
+	if !p.peekTokenIs(token.ELSE) {
+		return &expression
+	}
+
+	p.nextToken()
+	if !p.expectPeekToken(token.LEFT_BRACE) {
+		return nil
+	}
+
+	expression.Alternative = p.parseBlockStatement()
+
+	return &expression
 }
