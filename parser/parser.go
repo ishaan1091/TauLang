@@ -70,6 +70,7 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.TRUE] = p.parseBoolean
 	p.prefixParseFunctions[token.FALSE] = p.parseBoolean
 	p.prefixParseFunctions[token.STRING] = p.parseString
+	p.prefixParseFunctions[token.LEFT_PAREN] = p.parseGroupedExpressions
 
 	p.infixParseFunctions[token.EQUALS] = p.parseInfixExpression
 	p.infixParseFunctions[token.NOT_EQUALS] = p.parseInfixExpression
@@ -332,4 +333,20 @@ func (p *parser) parseCallExpression(function ast.Expression) ast.Expression {
 	expression.Arguments = args
 
 	return &expression
+}
+
+func (p *parser) parseGroupedExpressions() ast.Expression {
+	p.nextToken()
+
+	expression := p.parseExpression(LOWEST)
+
+	if !p.expectPeekToken(token.RIGHT_PAREN) {
+		return nil
+	}
+
+	// Here we don't need a separate node for Grouped expression as there purpose
+	// which was evaluating expression within parenthesis first got solved as we are
+	// forcing such behavior and hence these parenthesis have no significance anymore
+	// To better understand dry run following example - 1 + (2 + 3) + 4
+	return expression
 }

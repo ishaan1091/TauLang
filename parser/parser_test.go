@@ -229,39 +229,29 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name:  "success - expression statement - standard expression with identifier",
-			input: `(some_var + 5) * y`,
-			expectedErrors: []string{
-				"no prefix parse function found for LEFT_PAREN",
-				"no prefix parse function found for RIGHT_PAREN",
-				"no prefix parse function found for MULTIPLICATION",
-			},
+			name:           "success - expression statement - standard expression with identifier and grouped expression",
+			input:          `3 + y * (some_var + 5)`,
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.LEFT_PAREN, Literal: "("},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
+						Token: token.Token{Type: token.NUMBER, Literal: "3"},
 						Expression: &ast.InfixExpression{
 							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
-							Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
+							Left:     &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
 							Operator: "+",
-							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+							Right: &ast.InfixExpression{
+								Token:    token.Token{Type: token.MULTIPLICATION, Literal: "*"},
+								Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "y"}, Value: "y"},
+								Operator: "*",
+								Right: &ast.InfixExpression{
+									Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+									Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
+									Operator: "+",
+									Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+								},
+							},
 						},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.RIGHT_PAREN, Literal: ")"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.MULTIPLICATION, Literal: "*"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "y"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "y"}, Value: "y"},
 					},
 				},
 			},
