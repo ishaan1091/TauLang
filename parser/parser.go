@@ -16,8 +16,7 @@ const (
 	SUM         // +
 	PRODUCT     // *
 	PREFIX      // -X or !X
-	// TODO: Uncomment after implement parsing for call expression
-	//CALL        // myFunction(X)
+	CALL        // myFunction(X)
 )
 
 var precedences = map[token.Type]int{
@@ -31,8 +30,7 @@ var precedences = map[token.Type]int{
 	token.SUBTRACTION:    SUM,
 	token.DIVISION:       PRODUCT,
 	token.MULTIPLICATION: PRODUCT,
-	// TODO: Uncomment after implement parsing for call expression
-	//token.LEFT_PAREN:     CALL,
+	token.LEFT_PAREN:     CALL,
 }
 
 type Parser interface {
@@ -83,6 +81,8 @@ func NewParser(l lexer.Lexer) Parser {
 	p.infixParseFunctions[token.LESSER_EQUALS] = p.parseInfixExpression
 	p.infixParseFunctions[token.GREATER_THAN] = p.parseInfixExpression
 	p.infixParseFunctions[token.GREATER_EQUALS] = p.parseInfixExpression
+
+	p.infixParseFunctions[token.LEFT_PAREN] = p.parseCallExpression
 
 	// advancing tokens two times to populate both next and curr tokens
 	p.nextToken()
@@ -310,6 +310,26 @@ func (p *parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	precedence := p.currPrecedence()
 	p.nextToken()
 	expression.Right = p.parseExpression(precedence)
+
+	return &expression
+}
+
+func (p *parser) parseCallExpression(function ast.Expression) ast.Expression {
+	expression := ast.CallExpression{Token: p.currToken, Function: function}
+
+	var args []ast.Expression
+	for !p.currTokenIs(token.RIGHT_PAREN) {
+		p.nextToken()
+		args = append(args, p.parseExpression(LOWEST))
+
+		if !p.peekTokenIs(token.COMMA) && !p.peekTokenIs(token.RIGHT_PAREN) {
+			p.errors = append(p.errors, fmt.Sprintf("expected next token to be , or ) but got %s", p.currToken.Literal))
+			return nil
+		}
+		p.nextToken()
+	}
+
+	expression.Arguments = args
 
 	return &expression
 }

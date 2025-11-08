@@ -131,29 +131,20 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name:  "success - expression statement - function call",
-			input: `some_func(x);`,
-			expectedErrors: []string{
-				"no prefix parse function found for LEFT_PAREN",
-				"no prefix parse function found for RIGHT_PAREN",
-			},
+			name:           "success - expression statement - function call",
+			input:          `some_func(x);`,
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.LEFT_PAREN, Literal: "("},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "x"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.RIGHT_PAREN, Literal: ")"},
-						Expression: nil,
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
+						Expression: &ast.CallExpression{
+							Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
+							Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
+							Arguments: []ast.Expression{
+								&ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+							},
+						},
 					},
 				},
 			},
@@ -167,8 +158,6 @@ func TestParser(t *testing.T) {
 			`,
 			expectedErrors: []string{
 				"no prefix parse function found for FUNCTION",
-				"no prefix parse function found for LEFT_PAREN",
-				"no prefix parse function found for RIGHT_PAREN",
 				"no prefix parse function found for LEFT_BRACE",
 				"no prefix parse function found for RIGHT_BRACE",
 			},
@@ -179,20 +168,14 @@ func TestParser(t *testing.T) {
 						Expression: nil,
 					},
 					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.LEFT_PAREN, Literal: "("},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "x"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.RIGHT_PAREN, Literal: ")"},
-						Expression: nil,
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
+						Expression: &ast.CallExpression{
+							Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
+							Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
+							Arguments: []ast.Expression{
+								&ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+							},
+						},
 					},
 					&ast.ExpressionStatement{
 						Token:      token.Token{Type: token.LEFT_BRACE, Literal: "{"},
