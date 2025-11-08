@@ -152,42 +152,31 @@ func TestParser(t *testing.T) {
 		{
 			name: "success - expression statement - function declaration",
 			input: `
-			rasoi_mein_bata_diye some_func(x) {
+			sun_liyo_tau some_func ne_bana_diye rasoi_mein_bata_diye(x) {
 				laadle_ye_le x
 			};
 			`,
-			expectedErrors: []string{
-				"no prefix parse function found for FUNCTION",
-				"no prefix parse function found for LEFT_BRACE",
-				"no prefix parse function found for RIGHT_BRACE",
-			},
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.FUNCTION, Literal: "func"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
-						Expression: &ast.CallExpression{
-							Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
-							Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
-							Arguments: []ast.Expression{
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
+						Value: &ast.FunctionLiteral{
+							Token: token.Token{Type: token.FUNCTION, Literal: "func"},
+							Parameters: []ast.Expression{
 								&ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
 							},
+							Body: &ast.BlockStatement{
+								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+								Statements: []ast.Statement{
+									&ast.ReturnStatement{
+										Token:       token.Token{Type: token.RETURN, Literal: "return"},
+										ReturnValue: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+									},
+								},
+							},
 						},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.LEFT_BRACE, Literal: "{"},
-						Expression: nil,
-					},
-					&ast.ReturnStatement{
-						Token:       token.Token{Type: token.RETURN, Literal: "return"},
-						ReturnValue: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.RIGHT_BRACE, Literal: "}"},
-						Expression: nil,
 					},
 				},
 			},

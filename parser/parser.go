@@ -71,6 +71,7 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.FALSE] = p.parseBoolean
 	p.prefixParseFunctions[token.STRING] = p.parseString
 	p.prefixParseFunctions[token.LEFT_PAREN] = p.parseGroupedExpressions
+	p.prefixParseFunctions[token.FUNCTION] = p.parseFunctionLiteral
 
 	p.infixParseFunctions[token.EQUALS] = p.parseInfixExpression
 	p.infixParseFunctions[token.NOT_EQUALS] = p.parseInfixExpression
@@ -163,6 +164,10 @@ func (p *parser) noInfixParseFunctionError(tok token.Token) {
 		msg += fmt.Sprintf(" (%s)", tok.Literal)
 	}
 	p.errors = append(p.errors, msg)
+}
+
+func (p *parser) callExpressionPeekTokenMismatchError() {
+	p.errors = append(p.errors, fmt.Sprintf("expected next token to be , or ) but got %s", p.peekToken.Literal))
 }
 
 func (p *parser) parseStatement() ast.Statement {
@@ -324,7 +329,7 @@ func (p *parser) parseCallExpression(function ast.Expression) ast.Expression {
 		args = append(args, p.parseExpression(LOWEST))
 
 		if !p.peekTokenIs(token.COMMA) && !p.peekTokenIs(token.RIGHT_PAREN) {
-			p.errors = append(p.errors, fmt.Sprintf("expected next token to be , or ) but got %s", p.currToken.Literal))
+			p.callExpressionPeekTokenMismatchError()
 			return nil
 		}
 		p.nextToken()
@@ -349,4 +354,53 @@ func (p *parser) parseGroupedExpressions() ast.Expression {
 	// forcing such behavior and hence these parenthesis have no significance anymore
 	// To better understand dry run following example - 1 + (2 + 3) + 4
 	return expression
+}
+
+func (p *parser) parseFunctionLiteral() ast.Expression {
+	expression := ast.FunctionLiteral{Token: p.currToken}
+
+	if !p.expectPeekToken(token.LEFT_PAREN) {
+		return nil
+	}
+
+	var params []ast.Expression
+	for !p.currTokenIs(token.RIGHT_PAREN) {
+		p.nextToken()
+		params = append(params, p.parseExpression(LOWEST))
+
+		if !p.peekTokenIs(token.COMMA) && !p.peekTokenIs(token.RIGHT_PAREN) {
+			p.callExpressionPeekTokenMismatchError()
+			return nil
+		}
+		p.nextToken()
+	}
+	expression.Parameters = params
+
+	if !p.expectPeekToken(token.LEFT_BRACE) {
+		return nil
+	}
+
+	expression.Body = p.parseBlockStatement()
+
+	return &expression
+}
+
+func (p *parser) parseBlockStatement() *ast.BlockStatement {
+	block := ast.BlockStatement{Token: p.currToken}
+
+	var statements []ast.Statement
+	for !p.currTokenIs(token.RIGHT_BRACE) && !p.currTokenIs(token.EOF) {
+		p.nextToken()
+		statements = append(statements, p.parseStatement())
+		p.nextToken()
+	}
+
+	if p.currTokenIs(token.EOF) {
+		p.errors = append(p.errors, fmt.Sprintf("expected next token to be RIGHT_BRACE, found EOF"))
+		return nil
+	}
+
+	block.Statements = statements
+
+	return &block
 }
