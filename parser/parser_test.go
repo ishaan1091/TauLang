@@ -212,20 +212,17 @@ func TestParser(t *testing.T) {
 		{
 			name:           "success - expression statement - standard expression",
 			input:          `5 + 5`,
-			expectedErrors: []string{"no prefix parse function found for ADDITION"},
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
-						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
-						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						Token: token.Token{Type: token.NUMBER, Literal: "5"},
+						Expression: &ast.InfixExpression{
+							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+							Left:     &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						},
 					},
 				},
 			},
@@ -233,20 +230,17 @@ func TestParser(t *testing.T) {
 		{
 			name:           "success - expression statement - standard expression with identifier",
 			input:          `some_var + 5`,
-			expectedErrors: []string{"no prefix parse function found for ADDITION"},
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
-						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
+						Expression: &ast.InfixExpression{
+							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+							Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						},
 					},
 				},
 			},
@@ -256,7 +250,6 @@ func TestParser(t *testing.T) {
 			input: `(some_var + 5) * y`,
 			expectedErrors: []string{
 				"no prefix parse function found for LEFT_PAREN",
-				"no prefix parse function found for ADDITION",
 				"no prefix parse function found for RIGHT_PAREN",
 				"no prefix parse function found for MULTIPLICATION",
 			},
@@ -267,16 +260,13 @@ func TestParser(t *testing.T) {
 						Expression: nil,
 					},
 					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
-						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
+						Expression: &ast.InfixExpression{
+							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+							Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						},
 					},
 					&ast.ExpressionStatement{
 						Token:      token.Token{Type: token.RIGHT_PAREN, Literal: ")"},
@@ -294,73 +284,55 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name:  "success - expression statement - standard expression with identifier and prefix operator",
-			input: `-5 + some_var + 5`,
-			expectedErrors: []string{
-				"no prefix parse function found for ADDITION",
-				"no prefix parse function found for ADDITION",
-			},
+			name:           "success - expression statement - standard expression with identifier and prefix operator",
+			input:          `-5 + some_var + 5`,
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
 						Token: token.Token{Type: token.SUBTRACTION, Literal: "-"},
-						Expression: &ast.PrefixExpression{
-							Token:    token.Token{Type: token.SUBTRACTION, Literal: "-"},
-							Operator: "-",
-							Operand:  &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						Expression: &ast.InfixExpression{
+							Token: token.Token{Type: token.ADDITION, Literal: "+"},
+							Left: &ast.InfixExpression{
+								Token: token.Token{Type: token.ADDITION, Literal: "+"},
+								Left: &ast.PrefixExpression{
+									Token:    token.Token{Type: token.SUBTRACTION, Literal: "-"},
+									Operator: "-",
+									Operand:  &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+								},
+								Operator: "+",
+								Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
+							},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
 						},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
-						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
 					},
 				},
 			},
 		},
 		{
-			name:  "success - expression statement - standard expression with identifier and bang prefix operator",
-			input: `!5 + some_var + 5`,
-			expectedErrors: []string{
-				"no prefix parse function found for ADDITION",
-				"no prefix parse function found for ADDITION",
-			},
+			name:           "success - expression statement - standard expression with identifier and bang prefix operator",
+			input:          `!5 + some_var + 5`,
+			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
 					&ast.ExpressionStatement{
 						Token: token.Token{Type: token.BANG, Literal: "!"},
-						Expression: &ast.PrefixExpression{
-							Token:    token.Token{Type: token.BANG, Literal: "!"},
-							Operator: "!",
-							Operand:  &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+						Expression: &ast.InfixExpression{
+							Token: token.Token{Type: token.ADDITION, Literal: "+"},
+							Left: &ast.InfixExpression{
+								Token: token.Token{Type: token.ADDITION, Literal: "+"},
+								Left: &ast.PrefixExpression{
+									Token:    token.Token{Type: token.BANG, Literal: "!"},
+									Operator: "!",
+									Operand:  &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
+								},
+								Operator: "+",
+								Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
+							},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
 						},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.IDENTIFIER, Literal: "some_var"},
-						Expression: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_var"}, Value: "some_var"},
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.ADDITION, Literal: "+"},
-						Expression: nil,
-					},
-					&ast.ExpressionStatement{
-						Token:      token.Token{Type: token.NUMBER, Literal: "5"},
-						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "5"}, Value: 5},
 					},
 				},
 			},

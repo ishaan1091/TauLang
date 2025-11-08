@@ -16,7 +16,8 @@ const (
 	SUM         // +
 	PRODUCT     // *
 	PREFIX      // -X or !X
-	CALL        // myFunction(X)
+	// TODO: Uncomment after implement parsing for call expression
+	//CALL        // myFunction(X)
 )
 
 var precedences = map[token.Type]int{
@@ -30,7 +31,8 @@ var precedences = map[token.Type]int{
 	token.SUBTRACTION:    SUM,
 	token.DIVISION:       PRODUCT,
 	token.MULTIPLICATION: PRODUCT,
-	token.LEFT_PAREN:     CALL,
+	// TODO: Uncomment after implement parsing for call expression
+	//token.LEFT_PAREN:     CALL,
 }
 
 type Parser interface {
@@ -154,6 +156,14 @@ func (p *parser) noPrefixParseFunctionError(tok token.Token) {
 	p.errors = append(p.errors, msg)
 }
 
+func (p *parser) noInfixParseFunctionError(tok token.Token) {
+	msg := fmt.Sprintf("no infix parse function found for %s", tok.Type)
+	if tok.Type == token.ILLEGAL {
+		msg += fmt.Sprintf(" (%s)", tok.Literal)
+	}
+	p.errors = append(p.errors, msg)
+}
+
 func (p *parser) parseStatement() ast.Statement {
 	switch p.currToken.Type {
 	case token.LET:
@@ -220,6 +230,24 @@ func (p *parser) parseExpression(precedence int) ast.Expression {
 	}
 
 	left := prefixParser()
+
+	// Here breaking at semicolon would have also automatically been handled
+	// by precedence check (since semicolon has no precedence hence gets defauls
+	// precedence of LOWEST, which is the smallest value hence it can't be greater)
+	// But we kept this check explicit for better readability
+	for !p.peekTokenIs(token.SEMICOLON) && p.peekPrecedence() > precedence {
+		infixParser := p.infixParseFunctions[p.peekToken.Type]
+		if infixParser == nil {
+			p.noInfixParseFunctionError(p.peekToken)
+			return nil
+		}
+
+		p.nextToken()
+
+		// to understand why we did so dry run this code on following example
+		// eg - 1 * 2 + 3
+		left = infixParser(left)
+	}
 
 	return left
 }
