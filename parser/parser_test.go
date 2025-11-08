@@ -385,6 +385,70 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "success - while loop with break and continue",
+			input: `
+			jab_tak (x <= 3) {
+				agar_maan_lo (x == 3) {
+					rok_diye;
+				} na_toh {
+					jaan_de;
+				}
+			}
+			`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.WHILE, Literal: "while"},
+						Expression: &ast.WhileLoopExpression{
+							Token: token.Token{Type: token.WHILE, Literal: "while"},
+							Condition: &ast.InfixExpression{
+								Token:    token.Token{Type: token.LESSER_EQUALS, Literal: "<="},
+								Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+								Operator: "<=",
+								Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
+							},
+							Body: &ast.BlockStatement{
+								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+								Statements: []ast.Statement{
+									&ast.ExpressionStatement{
+										Token: token.Token{Type: token.IF, Literal: "if"},
+										Expression: &ast.ConditionalExpression{
+											Token: token.Token{Type: token.IF, Literal: "if"},
+											Condition: &ast.InfixExpression{
+												Token:    token.Token{Type: token.EQUALS, Literal: "=="},
+												Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+												Operator: "==",
+												Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
+											},
+											Consequence: &ast.BlockStatement{
+												Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+												Statements: []ast.Statement{
+													&ast.ExpressionStatement{
+														Token:      token.Token{Type: token.BREAK, Literal: "break"},
+														Expression: &ast.BreakExpression{Token: token.Token{Type: token.BREAK, Literal: "break"}},
+													},
+												},
+											},
+											Alternative: &ast.BlockStatement{
+												Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+												Statements: []ast.Statement{
+													&ast.ExpressionStatement{
+														Token:      token.Token{Type: token.CONTINUE, Literal: "continue"},
+														Expression: &ast.ContinueExpression{Token: token.Token{Type: token.CONTINUE, Literal: "continue"}},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

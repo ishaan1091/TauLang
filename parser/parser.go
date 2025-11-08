@@ -73,6 +73,9 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.LEFT_PAREN] = p.parseGroupedExpressions
 	p.prefixParseFunctions[token.FUNCTION] = p.parseFunctionLiteral
 	p.prefixParseFunctions[token.IF] = p.parseConditionalExpression
+	p.prefixParseFunctions[token.WHILE] = p.parseWhileLoop
+	p.prefixParseFunctions[token.BREAK] = p.parseBreak
+	p.prefixParseFunctions[token.CONTINUE] = p.parseContinue
 
 	p.infixParseFunctions[token.EQUALS] = p.parseInfixExpression
 	p.infixParseFunctions[token.NOT_EQUALS] = p.parseInfixExpression
@@ -440,4 +443,35 @@ func (p *parser) parseConditionalExpression() ast.Expression {
 	expression.Alternative = p.parseBlockStatement()
 
 	return &expression
+}
+
+func (p *parser) parseWhileLoop() ast.Expression {
+	expression := ast.WhileLoopExpression{Token: p.currToken}
+
+	if !p.expectPeekToken(token.LEFT_PAREN) {
+		return nil
+	}
+
+	p.nextToken()
+	expression.Condition = p.parseExpression(LOWEST)
+
+	if !p.expectPeekToken(token.RIGHT_PAREN) {
+		return nil
+	}
+
+	if !p.expectPeekToken(token.LEFT_BRACE) {
+		return nil
+	}
+
+	expression.Body = p.parseBlockStatement()
+
+	return &expression
+}
+
+func (p *parser) parseBreak() ast.Expression {
+	return &ast.BreakExpression{Token: p.currToken}
+}
+
+func (p *parser) parseContinue() ast.Expression {
+	return &ast.ContinueExpression{Token: p.currToken}
 }
