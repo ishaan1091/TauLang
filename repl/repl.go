@@ -48,7 +48,7 @@ func ExecuteInput(input string, logger *log.Logger) {
 		for _, e := range errors {
 			logger.Println(e)
 		}
-		logger.Println("\n")
+		logger.Print("\n\n")
 	}
 
 	logger.Println("AST for inputted program: ")
