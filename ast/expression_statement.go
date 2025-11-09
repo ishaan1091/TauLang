@@ -15,7 +15,7 @@ func (e *ExpressionStatement) TokenLiteral() string {
 
 func (e *ExpressionStatement) String() string {
 	if e.Expression != nil {
-		return e.Expression.String()
+		return e.Expression.String() + ";"
 	}
-	return ""
+	return ";"
 }

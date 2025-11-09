@@ -7,12 +7,13 @@ import (
 	"os"
 	"taulang/io"
 	"taulang/lexer"
+	"taulang/parser"
 )
 
 func StartREPL(logger *log.Logger) {
-	fmt.Println("Welcome to TauLang REPL!")
-	fmt.Println("Type 'exit' to quit.")
-	fmt.Println("")
+	logger.Println("Welcome to TauLang REPL!")
+	logger.Println("Type 'exit' to quit.")
+	logger.Println("")
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -20,7 +21,7 @@ func StartREPL(logger *log.Logger) {
 		if scanner.Scan() {
 			input := scanner.Text()
 			if input == "exit" {
-				fmt.Println("Exiting REPL. Goodbye!")
+				logger.Println("Exiting REPL. Goodbye!")
 				break
 			}
 			ExecuteInput(input, logger)
@@ -37,14 +38,20 @@ func ExecuteInput(input string, logger *log.Logger) {
 	if err != nil {
 		io.OutputFatalErrorAndExit(logger, err)
 	}
+	p := parser.NewParser(l)
 
-	for {
-		token := l.NextToken()
-		if token.Type == "EOF" {
-			break
+	program := p.Parse()
+	errors := p.Errors()
+
+	if errors != nil {
+		logger.Println("encountered errors while parsing: ")
+		for _, e := range errors {
+			logger.Println(e)
 		}
-		fmt.Printf("%+v\n", token)
+		logger.Println("\n")
 	}
 
-	fmt.Println(input)
+	logger.Println("AST for inputted program: ")
+	logger.Println(program)
+	logger.Println("")
 }
