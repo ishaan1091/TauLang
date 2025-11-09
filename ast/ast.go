@@ -1,9 +1,5 @@
 package ast
 
-type Program struct {
-	Statements []Statement
-}
-
 type Node interface {
 	TokenLiteral() string
 	String() string
