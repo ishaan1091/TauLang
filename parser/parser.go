@@ -288,7 +288,7 @@ func (p *parser) parseIntegerLiteral() ast.Expression {
 	expression := ast.IntegerLiteral{Token: p.currToken}
 
 	// TODO: Add support to parse decimal values
-	val, err := strconv.Atoi(p.currToken.Literal)
+	val, err := strconv.ParseInt(p.currToken.Literal, 0, 64)
 	if err != nil {
 		p.errors = append(p.errors, fmt.Sprintf("could not parse %q as integer", p.currToken.Literal))
 		return nil
