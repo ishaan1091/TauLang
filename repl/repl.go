@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"taulang/evaluator"
 	"taulang/io"
 	"taulang/lexer"
 	"taulang/parser"
@@ -43,7 +44,7 @@ func ExecuteInput(input string, logger *log.Logger) {
 	program := p.Parse()
 	errors := p.Errors()
 
-	if errors != nil {
+	if errors != nil && len(errors) != 0 {
 		logger.Println("encountered errors while parsing: ")
 		for _, e := range errors {
 			logger.Println(e)
@@ -51,7 +52,7 @@ func ExecuteInput(input string, logger *log.Logger) {
 		logger.Print("\n\n")
 	}
 
-	logger.Println("AST for inputted program: ")
-	logger.Println(program)
-	logger.Println("")
+	output := evaluator.Eval(program)
+
+	logger.Println(output.Inspect())
 }
