@@ -17,10 +17,31 @@ func TestEvaluator(t *testing.T) {
 		expectedObject object.Object
 	}{
 		{
-			name:  "success - integer",
+			name:  "success - integer 1",
 			input: "5;",
 			expectedObject: &object.Integer{
 				Value: 5,
+			},
+		},
+		{
+			name:  "success - integer 2",
+			input: "10;",
+			expectedObject: &object.Integer{
+				Value: 10,
+			},
+		},
+		{
+			name:  "success - boolean true",
+			input: "saccha;",
+			expectedObject: &object.Boolean{
+				Value: true,
+			},
+		},
+		{
+			name:  "success - boolean false",
+			input: "jhootha;",
+			expectedObject: &object.Boolean{
+				Value: false,
 			},
 		},
 	}
