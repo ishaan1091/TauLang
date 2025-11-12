@@ -44,6 +44,44 @@ func TestEvaluator(t *testing.T) {
 				Value: false,
 			},
 		},
+		{
+			name:  "success - prefix expression - bang true",
+			input: "!saccha;",
+			expectedObject: &object.Boolean{
+				Value: false,
+			},
+		},
+		{
+			name:  "success - boolean expression - bang false",
+			input: "!jhootha;",
+			expectedObject: &object.Boolean{
+				Value: true,
+			},
+		},
+		{
+			name:  "success - prefix expression - minus 1",
+			input: "-5;",
+			expectedObject: &object.Integer{
+				Value: -5,
+			},
+		},
+		{
+			name:  "success - prefix expression - minus 2",
+			input: "-10;",
+			expectedObject: &object.Integer{
+				Value: -10,
+			},
+		},
+		{
+			name:           "failure - prefix expression - minus operator on non integer types 1",
+			input:          "-saccha;",
+			expectedObject: nil,
+		},
+		{
+			name:           "failure - prefix expression - minus operator on non integer types 2",
+			input:          "-jhootha;",
+			expectedObject: nil,
+		},
 	}
 
 	for _, tc := range tests {
@@ -56,6 +94,8 @@ func TestEvaluator(t *testing.T) {
 			p := parser.NewParser(l)
 			program := p.Parse()
 			assert.NotNil(t, program)
+			errors := p.Errors()
+			assert.Empty(t, errors)
 
 			o := evaluator.Eval(program)
 			assert.Equal(t, tc.expectedObject, o)
