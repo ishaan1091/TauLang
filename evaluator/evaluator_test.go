@@ -59,6 +59,13 @@ func TestEvaluator(t *testing.T) {
 			},
 		},
 		{
+			name:  "success - boolean expression - bang integer",
+			input: "!!!!-5;",
+			expectedObject: &object.Boolean{
+				Value: true,
+			},
+		},
+		{
 			name:  "success - prefix expression - minus 1",
 			input: "-5;",
 			expectedObject: &object.Integer{
@@ -86,6 +93,61 @@ func TestEvaluator(t *testing.T) {
 			name:           "failure - multiple statements with error in first",
 			input:          "-jhootha;5;",
 			expectedObject: &object.Error{Message: "unknown operator: -BOOLEAN"},
+		},
+		{
+			name:           "success - infix expression 1",
+			input:          "5 + 5 + 5 + 5 - 10;",
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name:           "success - infix expression 2",
+			input:          "2 * 2 * 2 * 2 * 2;",
+			expectedObject: &object.Integer{Value: 32},
+		},
+		{
+			name:           "success - infix expression 3",
+			input:          "-50 + 100 + -50;",
+			expectedObject: &object.Integer{Value: 0},
+		},
+		{
+			name:           "success - infix expression 4",
+			input:          "5 * 2 + 10;",
+			expectedObject: &object.Integer{Value: 20},
+		},
+		{
+			name:           "success - infix expression 5",
+			input:          "5 + 2 * 10",
+			expectedObject: &object.Integer{Value: 25},
+		},
+		{
+			name:           "success - infix expression 6",
+			input:          "20 + 2 * -10",
+			expectedObject: &object.Integer{Value: 0},
+		},
+		{
+			name:           "success - infix expression 7",
+			input:          "50 / 2 * 2 + 10;",
+			expectedObject: &object.Integer{Value: 60},
+		},
+		{
+			name:           "success - infix expression 8",
+			input:          "2 * (5 + 10);",
+			expectedObject: &object.Integer{Value: 30},
+		},
+		{
+			name:           "success - infix expression 9",
+			input:          "3 * 3 * 3 + 10",
+			expectedObject: &object.Integer{Value: 37},
+		},
+		{
+			name:           "success - infix expression 10",
+			input:          "3 * (3 * 3) + 10",
+			expectedObject: &object.Integer{Value: 37},
+		},
+		{
+			name:           "success - infix expression 11",
+			input:          "(5 + 10 * 2 + 15 / 3) * 2 + -10",
+			expectedObject: &object.Integer{Value: 50},
 		},
 	}
 

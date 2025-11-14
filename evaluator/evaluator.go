@@ -23,6 +23,8 @@ func Eval(node ast.Node) object.Object {
 		return getBoolObject(node.Value)
 	case *ast.PrefixExpression:
 		return evalPrefixExpression(node.Operator, node.Operand)
+	case *ast.InfixExpression:
+		return evalInfixExpression(node.Operator, node.Left, node.Right)
 	}
 	return nil
 }
@@ -72,6 +74,35 @@ func evalMinusPrefixOperatorExpression(operand object.Object) object.Object {
 
 	value := operand.(*object.Integer).Value
 	return &object.Integer{Value: -value}
+}
+
+func evalInfixExpression(operator string, left ast.Expression, right ast.Expression) object.Object {
+	evaluatedLeft := Eval(left)
+	evaluatedRight := Eval(right)
+	switch {
+	case evaluatedLeft.Type() == object.INTEGER_OBJ && evaluatedRight.Type() == object.INTEGER_OBJ:
+		return evaluateIntegerInfixExpression(operator, evaluatedLeft.(*object.Integer), evaluatedRight.(*object.Integer))
+	default:
+		return newError("unknown operator: %s %s %s", evaluatedLeft.Type(), operator, evaluatedRight.Type())
+	}
+}
+
+func evaluateIntegerInfixExpression(operator string, left *object.Integer, right *object.Integer) object.Object {
+	leftVal := left.Value
+	rightVal := right.Value
+
+	switch operator {
+	case "+":
+		return &object.Integer{Value: leftVal + rightVal}
+	case "-":
+		return &object.Integer{Value: leftVal - rightVal}
+	case "*":
+		return &object.Integer{Value: leftVal * rightVal}
+	case "/":
+		return &object.Integer{Value: leftVal / rightVal}
+	default:
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
 }
 
 func newError(messageTemplate string, args ...any) *object.Error {
