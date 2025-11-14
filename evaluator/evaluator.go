@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"fmt"
 	"taulang/ast"
 	"taulang/object"
 )
@@ -45,8 +46,7 @@ func evalPrefixExpression(operator string, operand ast.Expression) object.Object
 	case "!":
 		return evalBangOperatorExpression(evaluatedOperand)
 	default:
-		// TODO: error type
-		return nil
+		return &object.Error{Message: fmt.Sprintf("unknown prefix expression: %s%s", operator, evaluatedOperand.Type())}
 	}
 }
 
@@ -59,8 +59,7 @@ func evalBangOperatorExpression(operand object.Object) object.Object {
 
 func evalMinusPrefixOperatorExpression(operand object.Object) object.Object {
 	if operand.Type() != object.INTEGER_OBJ {
-		// TODO: error type
-		return nil
+		return &object.Error{Message: fmt.Sprintf("unknown operator: -%s", operand.Type())}
 	}
 
 	value := operand.(*object.Integer).Value

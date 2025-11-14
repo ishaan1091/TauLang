@@ -75,12 +75,12 @@ func TestEvaluator(t *testing.T) {
 		{
 			name:           "failure - prefix expression - minus operator on non integer types 1",
 			input:          "-saccha;",
-			expectedObject: nil,
+			expectedObject: &object.Error{Message: "unknown operator: -BOOLEAN"},
 		},
 		{
 			name:           "failure - prefix expression - minus operator on non integer types 2",
 			input:          "-jhootha;",
-			expectedObject: nil,
+			expectedObject: &object.Error{Message: "unknown operator: -BOOLEAN"},
 		},
 	}
 
