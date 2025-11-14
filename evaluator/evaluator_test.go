@@ -82,6 +82,11 @@ func TestEvaluator(t *testing.T) {
 			input:          "-jhootha;",
 			expectedObject: &object.Error{Message: "unknown operator: -BOOLEAN"},
 		},
+		{
+			name:           "failure - multiple statements with error in first",
+			input:          "-jhootha;5;",
+			expectedObject: &object.Error{Message: "unknown operator: -BOOLEAN"},
+		},
 	}
 
 	for _, tc := range tests {
