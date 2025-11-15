@@ -292,6 +292,31 @@ func TestEvaluator(t *testing.T) {
 			`,
 			expectedObject: &object.Integer{Value: 10},
 		},
+		{
+			name:           "success - string literal expression",
+			input:          "\"test_string\";",
+			expectedObject: &object.String{Value: "test_string"},
+		},
+		{
+			name:           "success - infix expression - string concatenation",
+			input:          "laadle_ye_le \"tau\" + \" khush\";",
+			expectedObject: &object.String{Value: "tau khush"},
+		},
+		{
+			name:           "success - infix expression - truthy string equality check",
+			input:          "\"tau\" == \"tau\"",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - falsy string equality check",
+			input:          "\"tau\" == \"not_tau\"",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "failure - infix expression - string unknown operator",
+			input:          "\"tau\" * \"not_tau\";",
+			expectedObject: &object.Error{Message: "unknown operator: STRING * STRING"},
+		},
 	}
 
 	for _, tc := range tests {

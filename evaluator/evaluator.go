@@ -22,6 +22,8 @@ func Eval(node ast.Node) object.Object {
 		return &object.Integer{Value: node.Value}
 	case *ast.Boolean:
 		return getBoolObject(node.Value)
+	case *ast.String:
+		return &object.String{Value: node.Value}
 	case *ast.PrefixExpression:
 		return evalPrefixExpression(node.Operator, node.Operand)
 	case *ast.InfixExpression:
@@ -114,6 +116,8 @@ func evalInfixExpression(operator string, left ast.Expression, right ast.Express
 	switch {
 	case evaluatedLeft.Type() == object.INTEGER_OBJ && evaluatedRight.Type() == object.INTEGER_OBJ:
 		return evaluateIntegerInfixExpression(operator, evaluatedLeft.(*object.Integer), evaluatedRight.(*object.Integer))
+	case evaluatedLeft.Type() == object.STRING_OBJ && evaluatedRight.Type() == object.STRING_OBJ:
+		return evaluateStringInfixExpression(operator, evaluatedLeft.(*object.String), evaluatedRight.(*object.String))
 
 	// Below we are doing direct object comparisons of evaluated results as at this point we expect
 	// only boolean types which are using same object for all TRUE / FALSE
@@ -158,6 +162,22 @@ func evaluateIntegerInfixExpression(operator string, left *object.Integer, right
 		return getBoolObject(leftVal > rightVal)
 	case ">=":
 		return getBoolObject(leftVal >= rightVal)
+	default:
+		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
+	}
+}
+
+func evaluateStringInfixExpression(operator string, left *object.String, right *object.String) object.Object {
+	leftVal := left.Value
+	rightVal := right.Value
+
+	switch operator {
+	case "+":
+		return &object.String{Value: leftVal + rightVal}
+	case "==":
+		return getBoolObject(leftVal == rightVal)
+	case "!=":
+		return getBoolObject(leftVal != rightVal)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
