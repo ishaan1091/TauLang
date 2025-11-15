@@ -149,6 +149,11 @@ func TestEvaluator(t *testing.T) {
 			input:          "(5 + 10 * 2 + 15 / 3) * 2 + -10",
 			expectedObject: &object.Integer{Value: 50},
 		},
+		{
+			name:           "failure - infix expression - division by 0",
+			input:          "2 / 0 + -10",
+			expectedObject: &object.Error{Message: "division by zero"},
+		},
 	}
 
 	for _, tc := range tests {

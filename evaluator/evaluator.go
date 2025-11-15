@@ -25,8 +25,9 @@ func Eval(node ast.Node) object.Object {
 		return evalPrefixExpression(node.Operator, node.Operand)
 	case *ast.InfixExpression:
 		return evalInfixExpression(node.Operator, node.Left, node.Right)
+	default:
+		return newError("no defined evaluations for input: %s", node.String())
 	}
-	return nil
 }
 
 func evalProgram(statements []ast.Statement) object.Object {
@@ -34,7 +35,7 @@ func evalProgram(statements []ast.Statement) object.Object {
 	for _, s := range statements {
 		result = Eval(s)
 
-		if result.Type() == object.ERROR_OBJ {
+		if isError(result) {
 			return result
 		}
 	}
@@ -50,6 +51,10 @@ func getBoolObject(input bool) *object.Boolean {
 
 func evalPrefixExpression(operator string, operand ast.Expression) object.Object {
 	evaluatedOperand := Eval(operand)
+	if isError(evaluatedOperand) {
+		return evaluatedOperand
+	}
+
 	switch operator {
 	case "-":
 		return evalMinusPrefixOperatorExpression(evaluatedOperand)
@@ -78,7 +83,15 @@ func evalMinusPrefixOperatorExpression(operand object.Object) object.Object {
 
 func evalInfixExpression(operator string, left ast.Expression, right ast.Expression) object.Object {
 	evaluatedLeft := Eval(left)
+	if isError(evaluatedLeft) {
+		return evaluatedLeft
+	}
+
 	evaluatedRight := Eval(right)
+	if isError(evaluatedRight) {
+		return evaluatedRight
+	}
+
 	switch {
 	case evaluatedLeft.Type() == object.INTEGER_OBJ && evaluatedRight.Type() == object.INTEGER_OBJ:
 		return evaluateIntegerInfixExpression(operator, evaluatedLeft.(*object.Integer), evaluatedRight.(*object.Integer))
@@ -99,6 +112,10 @@ func evaluateIntegerInfixExpression(operator string, left *object.Integer, right
 	case "*":
 		return &object.Integer{Value: leftVal * rightVal}
 	case "/":
+		if rightVal == 0 {
+			return newError("division by zero")
+		}
+
 		return &object.Integer{Value: leftVal / rightVal}
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
@@ -107,4 +124,8 @@ func evaluateIntegerInfixExpression(operator string, left *object.Integer, right
 
 func newError(messageTemplate string, args ...any) *object.Error {
 	return &object.Error{Message: fmt.Sprintf(messageTemplate, args...)}
+}
+
+func isError(obj object.Object) bool {
+	return obj != nil && obj.Type() == object.ERROR_OBJ
 }
