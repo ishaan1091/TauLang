@@ -317,6 +317,31 @@ func TestEvaluator(t *testing.T) {
 			input:          "\"tau\" * \"not_tau\";",
 			expectedObject: &object.Error{Message: "unknown operator: STRING * STRING"},
 		},
+		{
+			name:           "success - let statement 1",
+			input:          "sun_liyo_tau a ne_bana_diye 5; a;",
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name: "success - let statement 2",
+			input: `
+			sun_liyo_tau a ne_bana_diye 5 * 2
+			sun_liyo_tau b ne_bana_diye a + 2;
+			sun_liyo_tau c ne_bana_diye a + b + 8
+			c;
+			`,
+			expectedObject: &object.Integer{Value: 30},
+		},
+		{
+			name:           "failure - identifier not found",
+			input:          "sun_liyo_tau a ne_bana_diye 5; c;",
+			expectedObject: &object.Error{Message: "identifier not found: c"},
+		},
+		{
+			name:           "failure - identifier not found",
+			input:          "a; sun_liyo_tau a ne_bana_diye 5;",
+			expectedObject: &object.Error{Message: "identifier not found: a"},
+		},
 	}
 
 	for _, tc := range tests {
@@ -332,7 +357,8 @@ func TestEvaluator(t *testing.T) {
 			errors := p.Errors()
 			assert.Empty(t, errors)
 
-			o := evaluator.Eval(program)
+			env := object.NewEnvironment()
+			o := evaluator.Eval(program, env)
 			assert.Equal(t, tc.expectedObject, o)
 		})
 	}

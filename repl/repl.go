@@ -8,6 +8,7 @@ import (
 	"taulang/evaluator"
 	"taulang/io"
 	"taulang/lexer"
+	"taulang/object"
 	"taulang/parser"
 )
 
@@ -52,7 +53,8 @@ func ExecuteInput(input string, logger *log.Logger) {
 		logger.Print("\n\n")
 	}
 
-	output := evaluator.Eval(program)
+	env := object.NewEnvironment()
+	output := evaluator.Eval(program, env)
 
 	logger.Println(output.Inspect())
 }
