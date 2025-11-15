@@ -95,6 +95,16 @@ func evalInfixExpression(operator string, left ast.Expression, right ast.Express
 	switch {
 	case evaluatedLeft.Type() == object.INTEGER_OBJ && evaluatedRight.Type() == object.INTEGER_OBJ:
 		return evaluateIntegerInfixExpression(operator, evaluatedLeft.(*object.Integer), evaluatedRight.(*object.Integer))
+
+	// Below we are doing direct object comparisons of evaluated results as at this point we expect
+	// only boolean types which are using same object for all TRUE / FALSE
+	case operator == "==":
+		return getBoolObject(evaluatedLeft == evaluatedRight)
+	case operator == "!=":
+		return getBoolObject(evaluatedLeft != evaluatedRight)
+
+	case evaluatedLeft.Type() != evaluatedRight.Type():
+		return newError("type mismatch: %s %s %s", evaluatedLeft.Type(), operator, evaluatedRight.Type())
 	default:
 		return newError("unknown operator: %s %s %s", evaluatedLeft.Type(), operator, evaluatedRight.Type())
 	}
@@ -117,6 +127,18 @@ func evaluateIntegerInfixExpression(operator string, left *object.Integer, right
 		}
 
 		return &object.Integer{Value: leftVal / rightVal}
+	case "==":
+		return &object.Boolean{Value: leftVal == rightVal}
+	case "!=":
+		return &object.Boolean{Value: leftVal != rightVal}
+	case "<":
+		return &object.Boolean{Value: leftVal < rightVal}
+	case "<=":
+		return &object.Boolean{Value: leftVal <= rightVal}
+	case ">":
+		return &object.Boolean{Value: leftVal > rightVal}
+	case ">=":
+		return &object.Boolean{Value: leftVal >= rightVal}
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}

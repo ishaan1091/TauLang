@@ -154,6 +154,86 @@ func TestEvaluator(t *testing.T) {
 			input:          "2 / 0 + -10",
 			expectedObject: &object.Error{Message: "division by zero"},
 		},
+		{
+			name:           "success - infix expression - truthy equality object comparison",
+			input:          "!!2 == saccha",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - falsy equality object comparison",
+			input:          "2 == jhootha",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - falsy inequality object comparison",
+			input:          "!!2 != saccha",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - truthy inequality object comparison",
+			input:          "2 != jhootha",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 1",
+			input:          "2 == 10 - 8",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 2",
+			input:          "2 == 10 * 8",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - integer comparison 3",
+			input:          "2 != 10 - 8",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - integer comparison 4",
+			input:          "2 != 10",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 5",
+			input:          "2 < 10",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 6",
+			input:          "2 < 1",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - integer comparison 7",
+			input:          "2 <= 2",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 8",
+			input:          "2 <= 1",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - integer comparison 9",
+			input:          "2 > 10 - 8",
+			expectedObject: &object.Boolean{Value: false},
+		},
+		{
+			name:           "success - infix expression - integer comparison 10",
+			input:          "2 > 1",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 11",
+			input:          "2 >= 10 - 8",
+			expectedObject: &object.Boolean{Value: true},
+		},
+		{
+			name:           "success - infix expression - integer comparison 12",
+			input:          "2 >= 10",
+			expectedObject: &object.Boolean{Value: false},
+		},
 	}
 
 	for _, tc := range tests {
