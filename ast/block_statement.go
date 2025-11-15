@@ -17,11 +17,11 @@ func (b *BlockStatement) TokenLiteral() string {
 func (b *BlockStatement) String() string {
 	var out strings.Builder
 
-	out.WriteString("{")
+	out.WriteString("{\n")
 	for _, statement := range b.Statements {
 		out.WriteString("\t" + statement.String())
 	}
-	out.WriteString("{")
+	out.WriteString("\n}")
 
 	return out.String()
 }
