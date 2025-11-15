@@ -155,6 +155,16 @@ func TestEvaluator(t *testing.T) {
 			expectedObject: &object.Error{Message: "division by zero"},
 		},
 		{
+			name:           "failure - infix expression type mismatch",
+			input:          "5 + saccha; 5;",
+			expectedObject: &object.Error{Message: "type mismatch: INTEGER + BOOLEAN"},
+		},
+		{
+			name:           "failure - infix expression type mismatch",
+			input:          "5; saccha + jhootha; 5",
+			expectedObject: &object.Error{Message: "unknown operator: BOOLEAN + BOOLEAN"},
+		},
+		{
 			name:           "success - infix expression - truthy equality object comparison",
 			input:          "!!2 == saccha",
 			expectedObject: &object.Boolean{Value: true},
