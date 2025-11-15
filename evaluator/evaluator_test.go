@@ -1,10 +1,12 @@
 package evaluator_test
 
 import (
+	"taulang/ast"
 	"taulang/evaluator"
 	"taulang/lexer"
 	"taulang/object"
 	"taulang/parser"
+	"taulang/token"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -341,6 +343,39 @@ func TestEvaluator(t *testing.T) {
 			name:           "failure - identifier not found",
 			input:          "a; sun_liyo_tau a ne_bana_diye 5;",
 			expectedObject: &object.Error{Message: "identifier not found: a"},
+		},
+		{
+			name:  "success - function definition",
+			input: "rasoi_mein_bata_diye(x) { x + 2; };",
+			expectedObject: &object.Function{
+				Params: []*ast.Identifier{
+					{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+						Value: "x",
+					},
+				},
+				Body: &ast.BlockStatement{
+					Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+					Statements: []ast.Statement{
+						&ast.ExpressionStatement{
+							Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+							Expression: &ast.InfixExpression{
+								Token: token.Token{Type: token.ADDITION, Literal: "+"},
+								Left: &ast.Identifier{
+									Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+									Value: "x",
+								},
+								Operator: "+",
+								Right: &ast.IntegerLiteral{
+									Token: token.Token{Type: token.NUMBER, Literal: "2"},
+									Value: 2,
+								},
+							},
+						},
+					},
+				},
+				Env: object.NewEnvironment(),
+			},
 		},
 	}
 

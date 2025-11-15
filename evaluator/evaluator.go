@@ -38,6 +38,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return evalLetStatement(node.Name, node.Value, env)
 	case *ast.Identifier:
 		return evalIdentifier(node.Value, env)
+	case *ast.FunctionLiteral:
+		return &object.Function{Params: node.Parameters, Body: node.Body, Env: env}
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
