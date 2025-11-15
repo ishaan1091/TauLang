@@ -18,6 +18,7 @@ func StartREPL(logger *log.Logger) {
 	logger.Println("")
 
 	scanner := bufio.NewScanner(os.Stdin)
+	env := object.NewEnvironment()
 	for {
 		fmt.Print(">> ")
 		if scanner.Scan() {
@@ -26,7 +27,7 @@ func StartREPL(logger *log.Logger) {
 				logger.Println("Exiting REPL. Goodbye!")
 				break
 			}
-			ExecuteInput(input, logger)
+			executeInputWithEnvironment(input, logger, env)
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -35,7 +36,11 @@ func StartREPL(logger *log.Logger) {
 }
 
 func ExecuteInput(input string, logger *log.Logger) {
-	// Lexical Analysis
+	env := object.NewEnvironment()
+	executeInputWithEnvironment(input, logger, env)
+}
+
+func executeInputWithEnvironment(input string, logger *log.Logger, env object.Environment) {
 	l, err := lexer.NewLexer(input)
 	if err != nil {
 		io.OutputFatalErrorAndExit(logger, err)
@@ -53,7 +58,6 @@ func ExecuteInput(input string, logger *log.Logger) {
 		logger.Print("\n\n")
 	}
 
-	env := object.NewEnvironment()
 	output := evaluator.Eval(program, env)
 
 	logger.Println(output.Inspect())
