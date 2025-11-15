@@ -234,6 +234,26 @@ func TestEvaluator(t *testing.T) {
 			input:          "2 >= 10",
 			expectedObject: &object.Boolean{Value: false},
 		},
+		{
+			name:           "success - conditional expression 1",
+			input:          "agar_maan_lo (1 < 2) { 10 }",
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name:           "success - conditional expression 2",
+			input:          "agar_maan_lo (1 > 2) { 10 }",
+			expectedObject: &object.Null{},
+		},
+		{
+			name:           "success - conditional expression 3",
+			input:          "agar_maan_lo (1 > 2) { 10 } na_toh { 20 }",
+			expectedObject: &object.Integer{Value: 20},
+		},
+		{
+			name:           "success - conditional expression 3",
+			input:          "agar_maan_lo (1 < 2) { 10 } na_toh { 20 }",
+			expectedObject: &object.Integer{Value: 10},
+		},
 	}
 
 	for _, tc := range tests {

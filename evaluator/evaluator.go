@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	NULL  = &object.Null{}
 	TRUE  = &object.Boolean{Value: true}
 	FALSE = &object.Boolean{Value: false}
 )
@@ -25,6 +26,10 @@ func Eval(node ast.Node) object.Object {
 		return evalPrefixExpression(node.Operator, node.Operand)
 	case *ast.InfixExpression:
 		return evalInfixExpression(node.Operator, node.Left, node.Right)
+	case *ast.ConditionalExpression:
+		return evalConditionalExpression(node.Condition, node.Consequence, node.Alternative)
+	case *ast.BlockStatement:
+		return evalBlock(node.Statements)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -66,7 +71,7 @@ func evalPrefixExpression(operator string, operand ast.Expression) object.Object
 }
 
 func evalBangOperatorExpression(operand object.Object) object.Object {
-	if operand == FALSE {
+	if operand == FALSE || operand == NULL {
 		return TRUE
 	}
 	return FALSE
@@ -128,20 +133,46 @@ func evaluateIntegerInfixExpression(operator string, left *object.Integer, right
 
 		return &object.Integer{Value: leftVal / rightVal}
 	case "==":
-		return &object.Boolean{Value: leftVal == rightVal}
+		return getBoolObject(leftVal == rightVal)
 	case "!=":
-		return &object.Boolean{Value: leftVal != rightVal}
+		return getBoolObject(leftVal != rightVal)
 	case "<":
-		return &object.Boolean{Value: leftVal < rightVal}
+		return getBoolObject(leftVal < rightVal)
 	case "<=":
-		return &object.Boolean{Value: leftVal <= rightVal}
+		return getBoolObject(leftVal <= rightVal)
 	case ">":
-		return &object.Boolean{Value: leftVal > rightVal}
+		return getBoolObject(leftVal > rightVal)
 	case ">=":
-		return &object.Boolean{Value: leftVal >= rightVal}
+		return getBoolObject(leftVal >= rightVal)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
+}
+
+func evalConditionalExpression(condition ast.Expression, consequence *ast.BlockStatement, alternative *ast.BlockStatement) object.Object {
+	evaluatedCondition := Eval(condition)
+	if isError(evaluatedCondition) {
+		return evaluatedCondition
+	}
+
+	if isTruthy(evaluatedCondition) {
+		return Eval(consequence)
+	} else if alternative != nil {
+		return Eval(alternative)
+	}
+
+	return NULL
+}
+
+func evalBlock(statements []ast.Statement) object.Object {
+	var result object.Object
+	for _, stmt := range statements {
+		result = Eval(stmt)
+		if isError(result) {
+			return result
+		}
+	}
+	return result
 }
 
 func newError(messageTemplate string, args ...any) *object.Error {
@@ -150,4 +181,11 @@ func newError(messageTemplate string, args ...any) *object.Error {
 
 func isError(obj object.Object) bool {
 	return obj != nil && obj.Type() == object.ERROR_OBJ
+}
+
+func isTruthy(obj object.Object) bool {
+	if obj == FALSE || obj == NULL {
+		return false
+	}
+	return true
 }
