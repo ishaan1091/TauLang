@@ -164,8 +164,8 @@ func TestParser(t *testing.T) {
 						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
 						Value: &ast.FunctionLiteral{
 							Token: token.Token{Type: token.FUNCTION, Literal: "func"},
-							Parameters: []ast.Expression{
-								&ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+							Parameters: []*ast.Identifier{
+								{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
 							},
 							Body: &ast.BlockStatement{
 								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},

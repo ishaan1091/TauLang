@@ -7,7 +7,7 @@ import (
 
 type FunctionLiteral struct {
 	Token      token.Token
-	Parameters []Expression
+	Parameters []*Identifier
 	Body       *BlockStatement
 }
 
@@ -18,7 +18,7 @@ func (f *FunctionLiteral) TokenLiteral() string {
 func (f *FunctionLiteral) String() string {
 	var out strings.Builder
 
-	params := []string{}
+	var params []string
 	for _, p := range f.Parameters {
 		params = append(params, p.String())
 	}

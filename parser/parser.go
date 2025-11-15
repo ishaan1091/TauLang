@@ -369,10 +369,16 @@ func (p *parser) parseFunctionLiteral() ast.Expression {
 		return nil
 	}
 
-	var params []ast.Expression
+	var params []*ast.Identifier
 	for !p.currTokenIs(token.RIGHT_PAREN) {
 		p.nextToken()
-		params = append(params, p.parseExpression(LOWEST))
+		param := p.parseExpression(LOWEST)
+		ident, ok := param.(*ast.Identifier)
+		if !ok {
+			p.errors = append(p.errors, fmt.Sprintf("expected IDENTIFIER in function parameters got: %s", param.String()))
+			return nil
+		}
+		params = append(params, ident)
 
 		if !p.peekTokenIs(token.COMMA) && !p.peekTokenIs(token.RIGHT_PAREN) {
 			p.callExpressionPeekTokenMismatchError()
