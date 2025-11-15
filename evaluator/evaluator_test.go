@@ -250,8 +250,36 @@ func TestEvaluator(t *testing.T) {
 			expectedObject: &object.Integer{Value: 20},
 		},
 		{
-			name:           "success - conditional expression 3",
+			name:           "success - conditional expression 4",
 			input:          "agar_maan_lo (1 < 2) { 10 } na_toh { 20 }",
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name:           "success - return statement 1",
+			input:          "laadle_ye_le 2 * 5; 9;",
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name:           "success - return statement 2",
+			input:          "9; laadle_ye_le 2 * 3; 9;",
+			expectedObject: &object.Integer{Value: 6},
+		},
+		{
+			name:           "success - return statement 3",
+			input:          "agar_maan_lo (10 > 1) { laadle_ye_le 10; }",
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name: "success - return statement 4",
+			input: `
+			agar_maan_lo (10 > 1) {
+			  agar_maan_lo (10 > 1) {
+				laadle_ye_le 10;
+			  }
+			
+			  laadle_ye_le 1;
+			}
+			`,
 			expectedObject: &object.Integer{Value: 10},
 		},
 	}

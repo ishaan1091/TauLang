@@ -30,9 +30,19 @@ func Eval(node ast.Node) object.Object {
 		return evalConditionalExpression(node.Condition, node.Consequence, node.Alternative)
 	case *ast.BlockStatement:
 		return evalBlock(node.Statements)
+	case *ast.ReturnStatement:
+		return evalReturnStatement(node.ReturnValue)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
+}
+
+func evalReturnStatement(returnValue ast.Expression) object.Object {
+	evaluatedReturnValue := Eval(returnValue)
+	if isError(evaluatedReturnValue) {
+		return evaluatedReturnValue
+	}
+	return &object.ReturnValue{Value: evaluatedReturnValue}
 }
 
 func evalProgram(statements []ast.Statement) object.Object {
@@ -42,6 +52,10 @@ func evalProgram(statements []ast.Statement) object.Object {
 
 		if isError(result) {
 			return result
+		}
+
+		if isReturnValue(result) {
+			return unwrapReturnValue(result)
 		}
 	}
 	return result
@@ -168,7 +182,7 @@ func evalBlock(statements []ast.Statement) object.Object {
 	var result object.Object
 	for _, stmt := range statements {
 		result = Eval(stmt)
-		if isError(result) {
+		if isError(result) || isReturnValue(result) {
 			return result
 		}
 	}
@@ -188,4 +202,15 @@ func isTruthy(obj object.Object) bool {
 		return false
 	}
 	return true
+}
+
+func isReturnValue(obj object.Object) bool {
+	return obj != nil && obj.Type() == object.RETURN_VALUE_OBJ
+}
+
+func unwrapReturnValue(obj object.Object) object.Object {
+	if returnValue, ok := obj.(*object.ReturnValue); ok {
+		return returnValue.Value
+	}
+	return obj
 }
