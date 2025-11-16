@@ -10,6 +10,7 @@ const (
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	STRING_OBJ       = "STRING"
 	FUNCTION_OBJ     = "FUNCTION"
+	BREAK_OBJ        = "BREAK"
 )
 
 type Object interface {

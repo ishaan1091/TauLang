@@ -8,6 +8,7 @@ import (
 
 var (
 	NULL  = &object.Null{}
+	BREAK = &object.Break{}
 	TRUE  = &object.Boolean{Value: true}
 	FALSE = &object.Boolean{Value: false}
 )
@@ -46,6 +47,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return evalAssignmentStatement(node.Name, node.Value, env)
 	case *ast.WhileLoopExpression:
 		return evalWhileLoopExpression(node.Condition, node.Body, env)
+	case *ast.BreakStatement:
+		return BREAK
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -77,6 +80,10 @@ func evalProgram(statements []ast.Statement, env object.Environment) object.Obje
 
 		if isReturnValue(result) {
 			return unwrapReturnValue(result)
+		}
+
+		if isBreakStatement(result) {
+			return newError("found break statement outside of loop")
 		}
 	}
 	return result
@@ -221,7 +228,7 @@ func evalBlock(statements []ast.Statement, env object.Environment) object.Object
 	var result object.Object
 	for _, stmt := range statements {
 		result = Eval(stmt, env)
-		if isError(result) || isReturnValue(result) {
+		if isError(result) || isReturnValue(result) || isBreakStatement(result) {
 			return result
 		}
 	}
@@ -292,16 +299,19 @@ func evalWhileLoopExpression(condition ast.Expression, body *ast.BlockStatement,
 			return evaluatedCondition
 		}
 
-		if evaluatedCondition.Type() != object.BOOLEAN_OBJ {
-			return newError("while loop requires a boolean condition, found: %s", evaluatedCondition.Type())
-		}
-
-		isConditionTruthy := evaluatedCondition.(*object.Boolean).Value
+		isConditionTruthy := isTruthy(evaluatedCondition)
 		if !isConditionTruthy {
 			break
 		}
 
 		result = Eval(body, env)
+		if isError(result) || isReturnValue(result) {
+			return result
+		}
+
+		if isBreakStatement(result) {
+			return NULL
+		}
 	}
 	return result
 }
@@ -341,4 +351,8 @@ func unwrapReturnValue(obj object.Object) object.Object {
 		return returnValue.Value
 	}
 	return obj
+}
+
+func isBreakStatement(obj object.Object) bool {
+	return obj == BREAK
 }

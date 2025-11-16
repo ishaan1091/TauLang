@@ -459,6 +459,53 @@ func TestEvaluator(t *testing.T) {
 			`,
 			expectedObject: &object.Integer{Value: 10032},
 		},
+		{
+			name: "success - while loop expression - break statement 1",
+			input: `
+			sun_liyo_tau incr ne_bana_diye rasoi_mein_bata_diye(n) { 
+				sun_liyo_tau i ne_bana_diye 0;
+				jab_tak (i) {
+					i ne_bana_diye i + 1
+					
+					agar_maan_lo (i == n) {
+						rok_diye
+					}
+				}
+				laadle_ye_le i; 
+			}; 
+			incr(5) + incr(100)
+			`,
+			expectedObject: &object.Integer{Value: 105},
+		},
+		{
+			name: "success - while loop expression - break statement 2",
+			input: `
+			sun_liyo_tau power ne_bana_diye rasoi_mein_bata_diye(x, n) { 
+				sun_liyo_tau i ne_bana_diye 0;
+				sun_liyo_tau result ne_bana_diye 1;
+				jab_tak (i) {
+					result ne_bana_diye x * result;
+					i ne_bana_diye i + 1
+					
+					agar_maan_lo (i == n) {
+						rok_diye
+					}
+				}
+				laadle_ye_le result; 
+			}; 
+			power(2, 5) + power(10, 4)
+			`,
+			expectedObject: &object.Integer{Value: 10032},
+		},
+		{
+			name: "failure - break statement outside while loop",
+			input: `
+			agar_maan_lo (saccha) {
+				rok_diye
+			}
+			`,
+			expectedObject: &object.Error{Message: "found break statement outside of loop"},
+		},
 	}
 
 	for _, tc := range tests {
