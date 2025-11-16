@@ -11,6 +11,7 @@ const (
 	STRING_OBJ       = "STRING"
 	FUNCTION_OBJ     = "FUNCTION"
 	BREAK_OBJ        = "BREAK"
+	CONTINUE_OBJ     = "CONTINUE"
 )
 
 type Object interface {

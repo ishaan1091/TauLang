@@ -7,10 +7,11 @@ import (
 )
 
 var (
-	NULL  = &object.Null{}
-	BREAK = &object.Break{}
-	TRUE  = &object.Boolean{Value: true}
-	FALSE = &object.Boolean{Value: false}
+	NULL     = &object.Null{}
+	BREAK    = &object.Break{}
+	CONTINUE = &object.Continue{}
+	TRUE     = &object.Boolean{Value: true}
+	FALSE    = &object.Boolean{Value: false}
 )
 
 func Eval(node ast.Node, env object.Environment) object.Object {
@@ -49,6 +50,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return evalWhileLoopExpression(node.Condition, node.Body, env)
 	case *ast.BreakStatement:
 		return BREAK
+	case *ast.ContinueStatement:
+		return CONTINUE
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -82,8 +85,12 @@ func evalProgram(statements []ast.Statement, env object.Environment) object.Obje
 			return unwrapReturnValue(result)
 		}
 
-		if isBreakStatement(result) {
+		if isBreak(result) {
 			return newError("found break statement outside of loop")
+		}
+
+		if isContinue(result) {
+			return newError("found continue statement outside of loop")
 		}
 	}
 	return result
@@ -228,7 +235,7 @@ func evalBlock(statements []ast.Statement, env object.Environment) object.Object
 	var result object.Object
 	for _, stmt := range statements {
 		result = Eval(stmt, env)
-		if isError(result) || isReturnValue(result) || isBreakStatement(result) {
+		if isError(result) || isReturnValue(result) || isBreak(result) || isContinue(result) {
 			return result
 		}
 	}
@@ -309,8 +316,12 @@ func evalWhileLoopExpression(condition ast.Expression, body *ast.BlockStatement,
 			return result
 		}
 
-		if isBreakStatement(result) {
+		if isBreak(result) {
 			return NULL
+		}
+
+		if isContinue(result) {
+			result = NULL
 		}
 	}
 	return result
@@ -353,6 +364,10 @@ func unwrapReturnValue(obj object.Object) object.Object {
 	return obj
 }
 
-func isBreakStatement(obj object.Object) bool {
+func isBreak(obj object.Object) bool {
 	return obj == BREAK
+}
+
+func isContinue(obj object.Object) bool {
+	return obj == CONTINUE
 }
