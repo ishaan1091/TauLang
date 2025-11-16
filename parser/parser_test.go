@@ -151,6 +151,23 @@ func TestParser(t *testing.T) {
 		},
 		{
 			name:           "success - expression statement - function call 2",
+			input:          `some_func();`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"},
+						Expression: &ast.CallExpression{
+							Token:     token.Token{Type: token.LEFT_PAREN, Literal: "("},
+							Function:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
+							Arguments: []ast.Expression{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - expression statement - function call 3",
 			input:          `ourFunction(20) + first + second;`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{

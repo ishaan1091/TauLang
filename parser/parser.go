@@ -329,6 +329,12 @@ func (p *parser) parseInfixExpression(left ast.Expression) ast.Expression {
 func (p *parser) parseCallExpression(function ast.Expression) ast.Expression {
 	expression := ast.CallExpression{Token: p.currToken, Function: function}
 
+	if p.peekTokenIs(token.RIGHT_PAREN) {
+		p.nextToken()
+		expression.Arguments = []ast.Expression{}
+		return &expression
+	}
+
 	var args []ast.Expression
 	for !p.currTokenIs(token.RIGHT_PAREN) {
 		p.nextToken()
