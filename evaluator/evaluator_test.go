@@ -377,6 +377,38 @@ func TestEvaluator(t *testing.T) {
 				Env: object.NewEnvironment(),
 			},
 		},
+		{
+			name:           "success - call expression 1",
+			input:          "sun_liyo_tau add ne_bana_diye rasoi_mein_bata_diye(x, y) { x + y; }; add(5 + 5, add(5, 5));",
+			expectedObject: &object.Integer{Value: 20},
+		},
+		{
+			name:           "success - call expression 2",
+			input:          "rasoi_mein_bata_diye(x) { x; }(5)",
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name: "success - call expression 3",
+			input: `
+			sun_liyo_tau first ne_bana_diye 10;
+			sun_liyo_tau second ne_bana_diye 10;
+			sun_liyo_tau third ne_bana_diye 10;
+			
+			sun_liyo_tau ourFunction ne_bana_diye rasoi_mein_bata_diye(first) {
+			  sun_liyo_tau second ne_bana_diye 20;
+			
+			  first + second + third;
+			};
+			
+			ourFunction(20) + first + second;
+			`,
+			expectedObject: &object.Integer{Value: 70},
+		},
+		{
+			name:           "failure - call expression - not a function",
+			input:          "sun_liyo_tau x ne_bana_diye 65; x(5)",
+			expectedObject: &object.Error{Message: "not a function: INTEGER"},
+		},
 	}
 
 	for _, tc := range tests {

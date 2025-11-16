@@ -6,7 +6,15 @@ type Environment interface {
 }
 
 type environment struct {
-	store map[string]Object
+	store    map[string]Object
+	outerEnv Environment
+}
+
+func NewEnclosedEnvironment(outerEnv Environment) Environment {
+	return &environment{
+		store:    map[string]Object{},
+		outerEnv: outerEnv,
+	}
 }
 
 func NewEnvironment() Environment {
@@ -17,6 +25,9 @@ func NewEnvironment() Environment {
 
 func (e *environment) Get(key string) (Object, bool) {
 	obj, ok := e.store[key]
+	if !ok && e.outerEnv != nil {
+		return e.outerEnv.Get(key)
+	}
 	return obj, ok
 }
 

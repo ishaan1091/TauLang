@@ -40,6 +40,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return evalIdentifier(node.Value, env)
 	case *ast.FunctionLiteral:
 		return &object.Function{Params: node.Parameters, Body: node.Body, Env: env}
+	case *ast.CallExpression:
+		return evaluateCallExpression(node.Function, node.Arguments, env)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -231,6 +233,51 @@ func evalLetStatement(name *ast.Identifier, value ast.Expression, env object.Env
 	env.Set(name.Value, evaluatedValue)
 
 	return NULL
+}
+
+func evaluateCallExpression(function ast.Expression, arguments []ast.Expression, env object.Environment) object.Object {
+	evaluatedFunc := Eval(function, env)
+	if isError(evaluatedFunc) {
+		return evaluatedFunc
+	}
+
+	if evaluatedFunc.Type() != object.FUNCTION_OBJ {
+		return newError("not a function: %s", evaluatedFunc.Type())
+	}
+	funcObj := evaluatedFunc.(*object.Function)
+
+	evaluatedArgs := evaluateArgExpression(arguments, env)
+	if len(evaluatedArgs) == 1 && isError(evaluatedArgs[0]) {
+		return evaluatedArgs[0]
+	}
+
+	enclosedEnv := extendEnvAndBindArgs(funcObj, evaluatedArgs, env)
+
+	result := Eval(funcObj.Body, enclosedEnv)
+
+	return unwrapReturnValue(result)
+}
+
+func evaluateArgExpression(arguments []ast.Expression, env object.Environment) []object.Object {
+	var evaluatedArgs []object.Object
+	for _, arg := range arguments {
+		result := Eval(arg, env)
+		if isError(result) {
+			return []object.Object{result}
+		}
+		evaluatedArgs = append(evaluatedArgs, result)
+	}
+	return evaluatedArgs
+}
+
+func extendEnvAndBindArgs(function *object.Function, args []object.Object, env object.Environment) object.Environment {
+	enclosedEnv := object.NewEnclosedEnvironment(env)
+
+	for idx, param := range function.Params {
+		enclosedEnv.Set(param.Value, args[idx])
+	}
+
+	return enclosedEnv
 }
 
 func newError(messageTemplate string, args ...any) *object.Error {
