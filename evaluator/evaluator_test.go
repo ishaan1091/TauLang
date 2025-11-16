@@ -409,6 +409,24 @@ func TestEvaluator(t *testing.T) {
 			input:          "sun_liyo_tau x ne_bana_diye 65; x(5)",
 			expectedObject: &object.Error{Message: "not a function: INTEGER"},
 		},
+		{
+			name:           "success - assignment statement 1",
+			input:          "sun_liyo_tau x ne_bana_diye 65; x ne_bana_diye x + 1;x",
+			expectedObject: &object.Integer{Value: 66},
+		},
+		{
+			name: "success - assignment statement 2",
+			input: `
+			sun_liyo_tau fn ne_bana_diye rasoi_mein_bata_diye() { 
+				laadle_ye_le 12; 
+			}; 
+			sun_liyo_tau x ne_bana_diye 65;
+			x ne_bana_diye fn();
+			x ne_bana_diye x + 1;
+			laadle_ye_le x;
+			`,
+			expectedObject: &object.Integer{Value: 13},
+		},
 	}
 
 	for _, tc := range tests {

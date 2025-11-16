@@ -42,6 +42,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return &object.Function{Params: node.Parameters, Body: node.Body, Env: env}
 	case *ast.CallExpression:
 		return evaluateCallExpression(node.Function, node.Arguments, env)
+	case *ast.AssignmentStatement:
+		return evalAssignmentStatement(node.Name, node.Value, env)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -278,6 +280,17 @@ func extendEnvAndBindArgs(function *object.Function, args []object.Object, env o
 	}
 
 	return enclosedEnv
+}
+
+func evalAssignmentStatement(name *ast.Identifier, value ast.Expression, env object.Environment) object.Object {
+	evaluatedValue := Eval(value, env)
+	if isError(evaluatedValue) {
+		return evaluatedValue
+	}
+
+	env.Set(name.Value, evaluatedValue)
+
+	return NULL
 }
 
 func newError(messageTemplate string, args ...any) *object.Error {
