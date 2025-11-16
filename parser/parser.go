@@ -182,6 +182,12 @@ func (p *parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.IDENTIFIER:
+		// Lookahead: if identifier followed by '=' that means it is assignment statement
+		if p.peekTokenIs(token.ASSIGNMENT) {
+			return p.parseAssignmentStatement()
+		}
+		return p.parseExpressionStatement()
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -214,6 +220,25 @@ func (p *parser) parseReturnStatement() ast.Statement {
 
 	p.nextToken()
 	statement.ReturnValue = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return &statement
+}
+
+func (p *parser) parseAssignmentStatement() ast.Statement {
+	statement := ast.AssignmentStatement{Token: p.currToken}
+
+	statement.Name = &ast.Identifier{Token: p.currToken, Value: p.currToken.Literal}
+
+	if !p.expectPeekToken(token.ASSIGNMENT) {
+		return nil
+	}
+
+	p.nextToken()
+	statement.Value = p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()

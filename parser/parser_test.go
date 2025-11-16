@@ -585,6 +585,101 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:           "success - assignment statement 1",
+			input:          "x ne_bana_diye x + 1",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.AssignmentStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						Value: &ast.InfixExpression{
+							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+							Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "1"}, Value: 1},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - assignment statement 2",
+			input:          "y ne_bana_diye foo(3);",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.AssignmentStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "y"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "y"}, Value: "y"},
+						Value: &ast.CallExpression{
+							Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
+							Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "foo"}, Value: "foo"},
+							Arguments: []ast.Expression{
+								&ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "failure - assignment statement 1",
+			input:          "3 + x ne_bana_diye x + 1",
+			expectedErrors: []string{"no prefix parse function found for ASSIGNMENT"},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.NUMBER, Literal: "3"},
+						Expression: &ast.InfixExpression{
+							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+							Left:     &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "3"}, Value: 3},
+							Operator: "+",
+							Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						},
+					},
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.ASSIGNMENT, Literal: "="},
+						Expression: nil,
+					},
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+						Expression: &ast.InfixExpression{
+							Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+							Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+							Operator: "+",
+							Right:    &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "1"}, Value: 1},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "failure - assignment statement 2",
+			input:          "foo() ne_bana_diye 10",
+			expectedErrors: []string{"no prefix parse function found for ASSIGNMENT"},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "foo"},
+						Expression: &ast.CallExpression{
+							Token:     token.Token{Type: token.LEFT_PAREN, Literal: "("},
+							Function:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "foo"}, Value: "foo"},
+							Arguments: []ast.Expression{},
+						},
+					},
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.ASSIGNMENT, Literal: "="},
+						Expression: nil,
+					},
+					&ast.ExpressionStatement{
+						Token:      token.Token{Type: token.NUMBER, Literal: "10"},
+						Expression: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "10"}, Value: 10},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
