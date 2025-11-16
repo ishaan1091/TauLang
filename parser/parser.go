@@ -74,8 +74,6 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.FUNCTION] = p.parseFunctionLiteral
 	p.prefixParseFunctions[token.IF] = p.parseConditionalExpression
 	p.prefixParseFunctions[token.WHILE] = p.parseWhileLoop
-	p.prefixParseFunctions[token.BREAK] = p.parseBreak
-	p.prefixParseFunctions[token.CONTINUE] = p.parseContinue
 
 	p.infixParseFunctions[token.EQUALS] = p.parseInfixExpression
 	p.infixParseFunctions[token.NOT_EQUALS] = p.parseInfixExpression
@@ -182,6 +180,10 @@ func (p *parser) parseStatement() ast.Statement {
 		return p.parseLetStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.BREAK:
+		return p.parseBreak()
+	case token.CONTINUE:
+		return p.parseContinue()
 	case token.IDENTIFIER:
 		// Lookahead: if identifier followed by '=' that means it is assignment statement
 		if p.peekTokenIs(token.ASSIGNMENT) {
@@ -511,10 +513,18 @@ func (p *parser) parseWhileLoop() ast.Expression {
 	return &expression
 }
 
-func (p *parser) parseBreak() ast.Expression {
-	return &ast.BreakExpression{Token: p.currToken}
+func (p *parser) parseBreak() ast.Statement {
+	statement := ast.BreakStatement{Token: p.currToken}
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return &statement
 }
 
-func (p *parser) parseContinue() ast.Expression {
-	return &ast.ContinueExpression{Token: p.currToken}
+func (p *parser) parseContinue() ast.Statement {
+	statement := ast.ContinueStatement{Token: p.currToken}
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	return &statement
 }

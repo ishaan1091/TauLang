@@ -21,6 +21,7 @@ func (a *AssignmentStatement) String() string {
 	out.WriteString(a.Name.String())
 	out.WriteString(" = ")
 	out.WriteString(a.Value.String())
+	out.WriteString(";")
 
 	return out.String()
 }

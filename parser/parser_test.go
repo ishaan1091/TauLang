@@ -561,19 +561,13 @@ func TestParser(t *testing.T) {
 											Consequence: &ast.BlockStatement{
 												Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
 												Statements: []ast.Statement{
-													&ast.ExpressionStatement{
-														Token:      token.Token{Type: token.BREAK, Literal: "break"},
-														Expression: &ast.BreakExpression{Token: token.Token{Type: token.BREAK, Literal: "break"}},
-													},
+													&ast.BreakStatement{Token: token.Token{Type: token.BREAK, Literal: "break"}},
 												},
 											},
 											Alternative: &ast.BlockStatement{
 												Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
 												Statements: []ast.Statement{
-													&ast.ExpressionStatement{
-														Token:      token.Token{Type: token.CONTINUE, Literal: "continue"},
-														Expression: &ast.ContinueExpression{Token: token.Token{Type: token.CONTINUE, Literal: "continue"}},
-													},
+													&ast.ContinueStatement{Token: token.Token{Type: token.CONTINUE, Literal: "continue"}},
 												},
 											},
 										},
