@@ -427,6 +427,38 @@ func TestEvaluator(t *testing.T) {
 			`,
 			expectedObject: &object.Integer{Value: 13},
 		},
+		{
+			name: "success - while loop expression 1",
+			input: `
+			sun_liyo_tau fn ne_bana_diye rasoi_mein_bata_diye() { 
+				laadle_ye_le 12; 
+			}; 
+			sun_liyo_tau x ne_bana_diye 65;
+			x ne_bana_diye fn();
+			jab_tak (x < 65) {
+				x ne_bana_diye x + fn();
+			}
+			x ne_bana_diye x + 1;
+			laadle_ye_le x;
+			`,
+			expectedObject: &object.Integer{Value: 73},
+		},
+		{
+			name: "success - while loop expression 2",
+			input: `
+			sun_liyo_tau power ne_bana_diye rasoi_mein_bata_diye(x, n) { 
+				sun_liyo_tau i ne_bana_diye 0;
+				sun_liyo_tau result ne_bana_diye 1;
+				jab_tak (i < n) {
+					result ne_bana_diye x * result;
+					i ne_bana_diye i + 1
+				}
+				laadle_ye_le result; 
+			}; 
+			power(2, 5) + power(10, 4)
+			`,
+			expectedObject: &object.Integer{Value: 10032},
+		},
 	}
 
 	for _, tc := range tests {

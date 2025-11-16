@@ -44,6 +44,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return evaluateCallExpression(node.Function, node.Arguments, env)
 	case *ast.AssignmentStatement:
 		return evalAssignmentStatement(node.Name, node.Value, env)
+	case *ast.WhileLoopExpression:
+		return evalWhileLoopExpression(node.Condition, node.Body, env)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -280,6 +282,28 @@ func extendEnvAndBindArgs(function *object.Function, args []object.Object, env o
 	}
 
 	return enclosedEnv
+}
+
+func evalWhileLoopExpression(condition ast.Expression, body *ast.BlockStatement, env object.Environment) object.Object {
+	var result object.Object = NULL
+	for {
+		evaluatedCondition := Eval(condition, env)
+		if isError(evaluatedCondition) {
+			return evaluatedCondition
+		}
+
+		if evaluatedCondition.Type() != object.BOOLEAN_OBJ {
+			return newError("while loop requires a boolean condition, found: %s", evaluatedCondition.Type())
+		}
+
+		isConditionTruthy := evaluatedCondition.(*object.Boolean).Value
+		if !isConditionTruthy {
+			break
+		}
+
+		result = Eval(body, env)
+	}
+	return result
 }
 
 func evalAssignmentStatement(name *ast.Identifier, value ast.Expression, env object.Environment) object.Object {
