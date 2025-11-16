@@ -131,7 +131,7 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name:           "success - expression statement - function call",
+			name:           "success - expression statement - function call 1",
 			input:          `some_func(x);`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
@@ -150,7 +150,36 @@ func TestParser(t *testing.T) {
 			},
 		},
 		{
-			name: "success - expression statement - function declaration",
+			name:           "success - expression statement - function call 2",
+			input:          `ourFunction(20) + first + second;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "ourFunction"},
+						Expression: &ast.InfixExpression{
+							Token: token.Token{Type: token.ADDITION, Literal: "+"},
+							Left: &ast.InfixExpression{
+								Token: token.Token{Type: token.ADDITION, Literal: "+"},
+								Left: &ast.CallExpression{
+									Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
+									Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "ourFunction"}, Value: "ourFunction"},
+									Arguments: []ast.Expression{
+										&ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "20"}, Value: 20},
+									},
+								},
+								Operator: "+",
+								Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "first"}, Value: "first"},
+							},
+							Operator: "+",
+							Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "second"}, Value: "second"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "success - expression statement - function declaration 1",
 			input: `
 			sun_liyo_tau some_func ne_bana_diye rasoi_mein_bata_diye(x) {
 				laadle_ye_le x
@@ -176,6 +205,96 @@ func TestParser(t *testing.T) {
 									},
 								},
 							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "success - expression statement - function declaration 2",
+			input: `
+			sun_liyo_tau first ne_bana_diye 10;
+			sun_liyo_tau second ne_bana_diye 10;
+			sun_liyo_tau third ne_bana_diye 10;
+			
+			sun_liyo_tau ourFunction ne_bana_diye rasoi_mein_bata_diye(first) {
+			  sun_liyo_tau second ne_bana_diye 20;
+			
+			  first + second + third;
+			};
+			
+			ourFunction(20) + first + second;
+			`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "first"}, Value: "first"},
+						Value: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "10"}, Value: 10},
+					},
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "second"}, Value: "second"},
+						Value: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "10"}, Value: 10},
+					},
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "third"}, Value: "third"},
+						Value: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "10"}, Value: 10},
+					},
+					&ast.LetStatement{
+						Token: token.Token{Type: token.LET, Literal: "let"},
+						Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "ourFunction"}, Value: "ourFunction"},
+						Value: &ast.FunctionLiteral{
+							Token: token.Token{Type: token.FUNCTION, Literal: "func"},
+							Parameters: []*ast.Identifier{
+								{Token: token.Token{Type: token.IDENTIFIER, Literal: "first"}, Value: "first"},
+							},
+							Body: &ast.BlockStatement{
+								Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+								Statements: []ast.Statement{
+									&ast.LetStatement{
+										Token: token.Token{Type: token.LET, Literal: "let"},
+										Name:  &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "second"}, Value: "second"},
+										Value: &ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "20"}, Value: 20},
+									},
+									&ast.ExpressionStatement{
+										Token: token.Token{Type: token.IDENTIFIER, Literal: "first"},
+										Expression: &ast.InfixExpression{
+											Token: token.Token{Type: token.ADDITION, Literal: "+"},
+											Left: &ast.InfixExpression{
+												Token:    token.Token{Type: token.ADDITION, Literal: "+"},
+												Left:     &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "first"}, Value: "first"},
+												Operator: "+",
+												Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "second"}, Value: "second"},
+											},
+											Operator: "+",
+											Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "third"}, Value: "third"},
+										},
+									},
+								},
+							},
+						},
+					},
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "ourFunction"},
+						Expression: &ast.InfixExpression{
+							Token: token.Token{Type: token.ADDITION, Literal: "+"},
+							Left: &ast.InfixExpression{
+								Token: token.Token{Type: token.ADDITION, Literal: "+"},
+								Left: &ast.CallExpression{
+									Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
+									Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "ourFunction"}, Value: "ourFunction"},
+									Arguments: []ast.Expression{
+										&ast.IntegerLiteral{Token: token.Token{Type: token.NUMBER, Literal: "20"}, Value: 20},
+									},
+								},
+								Operator: "+",
+								Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "first"}, Value: "first"},
+							},
+							Operator: "+",
+							Right:    &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "second"}, Value: "second"},
 						},
 					},
 				},

@@ -400,9 +400,10 @@ func (p *parser) parseFunctionLiteral() ast.Expression {
 func (p *parser) parseBlockStatement() *ast.BlockStatement {
 	block := ast.BlockStatement{Token: p.currToken}
 
+	p.nextToken()
+
 	var statements []ast.Statement
 	for !p.currTokenIs(token.RIGHT_BRACE) && !p.currTokenIs(token.EOF) {
-		p.nextToken()
 		statements = append(statements, p.parseStatement())
 		p.nextToken()
 	}
