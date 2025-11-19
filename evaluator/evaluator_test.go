@@ -545,6 +545,43 @@ func TestEvaluator(t *testing.T) {
 			input:          "len(\"twitter\");",
 			expectedObject: &object.Integer{Value: 7},
 		},
+		{
+			name:  "success - array literal",
+			input: "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }]",
+			expectedObject: &object.Array{
+				Elements: []object.Object{
+					&object.Integer{Value: 3},
+					&object.String{Value: "hello"},
+					&object.Boolean{Value: true},
+					&object.Function{
+						Params: []*ast.Identifier{
+							{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+						},
+						Body: &ast.BlockStatement{
+							Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+							Statements: []ast.Statement{
+								&ast.ExpressionStatement{
+									Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+									Expression: &ast.InfixExpression{
+										Token: token.Token{Type: token.ADDITION, Literal: "+"},
+										Left: &ast.Identifier{
+											Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+											Value: "x",
+										},
+										Operator: "+",
+										Right: &ast.IntegerLiteral{
+											Token: token.Token{Type: token.NUMBER, Literal: "2"},
+											Value: 2,
+										},
+									},
+								},
+							},
+						},
+						Env: object.NewEnvironment(),
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

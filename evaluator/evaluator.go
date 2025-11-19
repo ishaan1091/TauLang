@@ -52,6 +52,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return BREAK
 	case *ast.ContinueStatement:
 		return CONTINUE
+	case *ast.ArrayLiteral:
+		return evalArrayLiteral(node.Elements, env)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -264,7 +266,7 @@ func evalCallExpression(function ast.Expression, arguments []ast.Expression, env
 		return evaluatedFunc
 	}
 
-	evaluatedArgs := evaluateArgExpression(arguments, env)
+	evaluatedArgs := evaluateExpression(arguments, env)
 	if len(evaluatedArgs) == 1 && isError(evaluatedArgs[0]) {
 		return evaluatedArgs[0]
 	}
@@ -281,9 +283,9 @@ func evalCallExpression(function ast.Expression, arguments []ast.Expression, env
 	}
 }
 
-func evaluateArgExpression(arguments []ast.Expression, env object.Environment) []object.Object {
+func evaluateExpression(expressions []ast.Expression, env object.Environment) []object.Object {
 	var evaluatedArgs []object.Object
-	for _, arg := range arguments {
+	for _, arg := range expressions {
 		result := Eval(arg, env)
 		if isError(result) {
 			return []object.Object{result}
@@ -341,6 +343,15 @@ func evalAssignmentStatement(name *ast.Identifier, value ast.Expression, env obj
 	env.Set(name.Value, evaluatedValue)
 
 	return NULL
+}
+
+func evalArrayLiteral(elements []ast.Expression, env object.Environment) object.Object {
+	evaluatedElements := evaluateExpression(elements, env)
+	if len(elements) == 1 && isError(evaluatedElements[0]) {
+		return evaluatedElements[0]
+	}
+
+	return &object.Array{Elements: evaluatedElements}
 }
 
 func newError(messageTemplate string, args ...any) *object.Error {
