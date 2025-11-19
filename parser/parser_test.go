@@ -780,6 +780,94 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:           "success - index expression - array 1",
+			input:          "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }][some_func(x)]",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+						Expression: &ast.IndexExpression{
+							Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+							IndexedExpression: &ast.ArrayLiteral{
+								Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+								Elements: []ast.Expression{
+									&ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "3"},
+										Value: 3,
+									},
+									&ast.String{
+										Token: token.Token{Type: token.STRING, Literal: "hello"},
+										Value: "hello",
+									},
+									&ast.Boolean{
+										Token: token.Token{Type: token.TRUE, Literal: "true"},
+										Value: true,
+									},
+									&ast.FunctionLiteral{
+										Token: token.Token{Type: token.FUNCTION, Literal: "func"},
+										Parameters: []*ast.Identifier{
+											{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+										},
+										Body: &ast.BlockStatement{
+											Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+											Statements: []ast.Statement{
+												&ast.ExpressionStatement{
+													Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+													Expression: &ast.InfixExpression{
+														Token: token.Token{Type: token.ADDITION, Literal: "+"},
+														Left: &ast.Identifier{
+															Token: token.Token{Type: token.IDENTIFIER, Literal: "x"},
+															Value: "x",
+														},
+														Operator: "+",
+														Right: &ast.IntegerLiteral{
+															Token: token.Token{Type: token.NUMBER, Literal: "2"},
+															Value: 2,
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							Index: &ast.CallExpression{
+								Token:    token.Token{Type: token.LEFT_PAREN, Literal: "("},
+								Function: &ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "some_func"}, Value: "some_func"},
+								Arguments: []ast.Expression{
+									&ast.Identifier{Token: token.Token{Type: token.IDENTIFIER, Literal: "x"}, Value: "x"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - index expression - array 2",
+			input:          "myArr[1]",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.IDENTIFIER, Literal: "myArr"},
+						Expression: &ast.IndexExpression{
+							Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+							IndexedExpression: &ast.Identifier{
+								Token: token.Token{Type: token.IDENTIFIER, Literal: "myArr"},
+								Value: "myArr",
+							},
+							Index: &ast.IntegerLiteral{
+								Token: token.Token{Type: token.NUMBER, Literal: "1"},
+								Value: 1,
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
