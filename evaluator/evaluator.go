@@ -43,7 +43,7 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 	case *ast.FunctionLiteral:
 		return &object.Function{Params: node.Parameters, Body: node.Body, Env: env}
 	case *ast.CallExpression:
-		return evaluateCallExpression(node.Function, node.Arguments, env)
+		return evalCallExpression(node.Function, node.Arguments, env)
 	case *ast.AssignmentStatement:
 		return evalAssignmentStatement(node.Name, node.Value, env)
 	case *ast.WhileLoopExpression:
@@ -61,6 +61,11 @@ func evalIdentifier(identifierName string, env object.Environment) object.Object
 	if obj, ok := env.Get(identifierName); ok {
 		return obj
 	}
+
+	if obj, ok := builtins[identifierName]; ok {
+		return obj
+	}
+
 	return newError("identifier not found: %s", identifierName)
 }
 
@@ -253,27 +258,27 @@ func evalLetStatement(name *ast.Identifier, value ast.Expression, env object.Env
 	return NULL
 }
 
-func evaluateCallExpression(function ast.Expression, arguments []ast.Expression, env object.Environment) object.Object {
+func evalCallExpression(function ast.Expression, arguments []ast.Expression, env object.Environment) object.Object {
 	evaluatedFunc := Eval(function, env)
 	if isError(evaluatedFunc) {
 		return evaluatedFunc
 	}
-
-	if evaluatedFunc.Type() != object.FUNCTION_OBJ {
-		return newError("not a function: %s", evaluatedFunc.Type())
-	}
-	funcObj := evaluatedFunc.(*object.Function)
 
 	evaluatedArgs := evaluateArgExpression(arguments, env)
 	if len(evaluatedArgs) == 1 && isError(evaluatedArgs[0]) {
 		return evaluatedArgs[0]
 	}
 
-	enclosedEnv := extendEnvAndBindArgs(funcObj, evaluatedArgs, env)
-
-	result := Eval(funcObj.Body, enclosedEnv)
-
-	return unwrapReturnValue(result)
+	switch funcObj := evaluatedFunc.(type) {
+	case *object.Function:
+		enclosedEnv := extendEnvAndBindArgs(funcObj, evaluatedArgs, env)
+		result := Eval(funcObj.Body, enclosedEnv)
+		return unwrapReturnValue(result)
+	case *object.Builtin:
+		return funcObj.Fn(evaluatedArgs...)
+	default:
+		return newError("not a function: %s", evaluatedFunc.Type())
+	}
 }
 
 func evaluateArgExpression(arguments []ast.Expression, env object.Environment) []object.Object {

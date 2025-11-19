@@ -12,6 +12,7 @@ const (
 	FUNCTION_OBJ     = "FUNCTION"
 	BREAK_OBJ        = "BREAK"
 	CONTINUE_OBJ     = "CONTINUE"
+	BUILTIN_OBJ      = "BUILTIN"
 )
 
 type Object interface {

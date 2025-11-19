@@ -535,6 +535,16 @@ func TestEvaluator(t *testing.T) {
 			`,
 			expectedObject: &object.Error{Message: "found continue statement outside of loop"},
 		},
+		{
+			name:           "success - builtin function - len - string 1",
+			input:          "sun_liyo_tau a ne_bana_diye \"test string\"; len(a);",
+			expectedObject: &object.Integer{Value: 11},
+		},
+		{
+			name:           "success - builtin function - len - string 2",
+			input:          "len(\"twitter\");",
+			expectedObject: &object.Integer{Value: 7},
+		},
 	}
 
 	for _, tc := range tests {
