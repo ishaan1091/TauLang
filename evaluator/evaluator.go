@@ -371,7 +371,7 @@ func evalIndexExpression(expression ast.Expression, index ast.Expression, env ob
 	case evaluatedIndexedObject.Type() == object.ARRAY_OBJ && evaluatedIndex.Type() == object.INTEGER_OBJ:
 		return evalArrayIndexExpression(evaluatedIndexedObject, evaluatedIndex)
 	default:
-		return newError("index operator not supported: %s", evaluatedIndexedObject.Type())
+		return newError("index operator not supported: %s[%s]", evaluatedIndexedObject.Type(), evaluatedIndex.Type())
 	}
 }
 

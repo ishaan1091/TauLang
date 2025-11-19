@@ -546,6 +546,11 @@ func TestEvaluator(t *testing.T) {
 			expectedObject: &object.Integer{Value: 7},
 		},
 		{
+			name:           "success - builtin function - len - array",
+			input:          "len([1, \"twitter\", saccha]);",
+			expectedObject: &object.Integer{Value: 3},
+		},
+		{
 			name:  "success - array literal",
 			input: "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }]",
 			expectedObject: &object.Array{
@@ -611,6 +616,26 @@ func TestEvaluator(t *testing.T) {
 			name:           "success - index expression - array 6",
 			input:          "[1, 2, 3][-1]",
 			expectedObject: &object.Null{},
+		},
+		{
+			name:           "failure - index expression",
+			input:          "[1, 2, 3][saccha]",
+			expectedObject: &object.Error{Message: "index operator not supported: ARRAY[BOOLEAN]"},
+		},
+		{
+			name:           "success - builtin function - first",
+			input:          "first([1, 2, 3])",
+			expectedObject: &object.Integer{Value: 1},
+		},
+		{
+			name:           "success - builtin function - last",
+			input:          "last([1, 2, 3])",
+			expectedObject: &object.Integer{Value: 3},
+		},
+		{
+			name:           "success - builtin function - last",
+			input:          "last(push([1, 2, 3], 4))",
+			expectedObject: &object.Integer{Value: 4},
 		},
 	}
 
