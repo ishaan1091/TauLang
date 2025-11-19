@@ -582,6 +582,36 @@ func TestEvaluator(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:           "success - index expression - array 1",
+			input:          "[1, 2, 3][2]",
+			expectedObject: &object.Integer{Value: 3},
+		},
+		{
+			name:           "success - index expression - array 2",
+			input:          "sun_liyo_tau i ne_bana_diye 0; [1][i];",
+			expectedObject: &object.Integer{Value: 1},
+		},
+		{
+			name:           "success - index expression - array 3",
+			input:          "sun_liyo_tau myArray ne_bana_diye [1, 2, 3]; sun_liyo_tau i ne_bana_diye myArray[0]; myArray[i]",
+			expectedObject: &object.Integer{Value: 2},
+		},
+		{
+			name:           "success - index expression - array 4",
+			input:          "[1, 2, 3][1 + 1];",
+			expectedObject: &object.Integer{Value: 3},
+		},
+		{
+			name:           "success - index expression - array 5",
+			input:          "[1, 2, 3][3]",
+			expectedObject: &object.Null{},
+		},
+		{
+			name:           "success - index expression - array 6",
+			input:          "[1, 2, 3][-1]",
+			expectedObject: &object.Null{},
+		},
 	}
 
 	for _, tc := range tests {

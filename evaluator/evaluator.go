@@ -54,6 +54,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return CONTINUE
 	case *ast.ArrayLiteral:
 		return evalArrayLiteral(node.Elements, env)
+	case *ast.IndexExpression:
+		return evalIndexExpression(node.IndexedExpression, node.Index, env)
 	default:
 		return newError("no defined evaluations for input: %s", node.String())
 	}
@@ -352,6 +354,36 @@ func evalArrayLiteral(elements []ast.Expression, env object.Environment) object.
 	}
 
 	return &object.Array{Elements: evaluatedElements}
+}
+
+func evalIndexExpression(expression ast.Expression, index ast.Expression, env object.Environment) object.Object {
+	evaluatedIndexedObject := Eval(expression, env)
+	if isError(evaluatedIndexedObject) {
+		return evaluatedIndexedObject
+	}
+
+	evaluatedIndex := Eval(index, env)
+	if isError(evaluatedIndex) {
+		return evaluatedIndex
+	}
+
+	switch {
+	case evaluatedIndexedObject.Type() == object.ARRAY_OBJ && evaluatedIndex.Type() == object.INTEGER_OBJ:
+		return evalArrayIndexExpression(evaluatedIndexedObject, evaluatedIndex)
+	default:
+		return newError("index operator not supported: %s", evaluatedIndexedObject.Type())
+	}
+}
+
+func evalArrayIndexExpression(indexedObject object.Object, index object.Object) object.Object {
+	array := indexedObject.(*object.Array).Elements
+	indexVal := index.(*object.Integer).Value
+
+	if indexVal < 0 || indexVal >= int64(len(array)) {
+		return NULL
+	}
+
+	return array[indexVal]
 }
 
 func newError(messageTemplate string, args ...any) *object.Error {
