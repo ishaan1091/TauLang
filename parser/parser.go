@@ -72,6 +72,7 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.STRING] = p.parseString
 	p.prefixParseFunctions[token.LEFT_PAREN] = p.parseGroupedExpressions
 	p.prefixParseFunctions[token.FUNCTION] = p.parseFunctionLiteral
+	p.prefixParseFunctions[token.LEFT_BRACKET] = p.parseArrayLiteral
 	p.prefixParseFunctions[token.IF] = p.parseConditionalExpression
 	p.prefixParseFunctions[token.WHILE] = p.parseWhileLoop
 
@@ -356,23 +357,7 @@ func (p *parser) parseInfixExpression(left ast.Expression) ast.Expression {
 func (p *parser) parseCallExpression(function ast.Expression) ast.Expression {
 	expression := ast.CallExpression{Token: p.currToken, Function: function}
 
-	if p.peekTokenIs(token.RIGHT_PAREN) {
-		p.nextToken()
-		expression.Arguments = []ast.Expression{}
-		return &expression
-	}
-
-	var args []ast.Expression
-	for !p.currTokenIs(token.RIGHT_PAREN) {
-		p.nextToken()
-		args = append(args, p.parseExpression(LOWEST))
-
-		if !p.peekTokenIs(token.COMMA) && !p.peekTokenIs(token.RIGHT_PAREN) {
-			p.callExpressionPeekTokenMismatchError()
-			return nil
-		}
-		p.nextToken()
-	}
+	args := p.parseExpressionList(token.RIGHT_PAREN)
 
 	expression.Arguments = args
 
@@ -527,4 +512,32 @@ func (p *parser) parseContinue() ast.Statement {
 		p.nextToken()
 	}
 	return &statement
+}
+
+func (p *parser) parseArrayLiteral() ast.Expression {
+	expression := ast.ArrayLiteral{Token: p.currToken}
+
+	expression.Elements = p.parseExpressionList(token.RIGHT_BRACKET)
+
+	return &expression
+}
+
+func (p *parser) parseExpressionList(end token.Type) []ast.Expression {
+	if p.peekTokenIs(end) {
+		p.nextToken()
+		return []ast.Expression{}
+	}
+
+	var args []ast.Expression
+	for !p.currTokenIs(end) {
+		p.nextToken()
+		args = append(args, p.parseExpression(LOWEST))
+
+		if !p.peekTokenIs(token.COMMA) && !p.peekTokenIs(end) {
+			p.callExpressionPeekTokenMismatchError()
+			return args
+		}
+		p.nextToken()
+	}
+	return args
 }
