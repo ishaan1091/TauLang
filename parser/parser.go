@@ -75,6 +75,7 @@ func NewParser(l lexer.Lexer) Parser {
 	p.prefixParseFunctions[token.LEFT_PAREN] = p.parseGroupedExpressions
 	p.prefixParseFunctions[token.FUNCTION] = p.parseFunctionLiteral
 	p.prefixParseFunctions[token.LEFT_BRACKET] = p.parseArrayLiteral
+	p.prefixParseFunctions[token.LEFT_BRACE] = p.parseHashLiteral
 	p.prefixParseFunctions[token.IF] = p.parseConditionalExpression
 	p.prefixParseFunctions[token.WHILE] = p.parseWhileLoop
 
@@ -435,7 +436,7 @@ func (p *parser) parseBlockStatement() *ast.BlockStatement {
 	}
 
 	if p.currTokenIs(token.EOF) {
-		p.errors = append(p.errors, fmt.Sprintf("expected next token to be RIGHT_BRACE, found EOF"))
+		p.errors = append(p.errors, "expected next token to be RIGHT_BRACE, found EOF")
 		return nil
 	}
 
@@ -553,6 +554,44 @@ func (p *parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	expression.Index = p.parseExpression(LOWEST)
 
 	if !p.expectPeekToken(token.RIGHT_BRACKET) {
+		return nil
+	}
+
+	return &expression
+}
+
+func (p *parser) parseHashLiteral() ast.Expression {
+	expression := ast.HashLiteral{
+		Token: p.currToken,
+		Pairs: []ast.HashPair{},
+	}
+
+	for !p.peekTokenIs(token.RIGHT_BRACE) {
+		p.nextToken()
+		keyExpression := p.parseExpression(LOWEST)
+
+		if !p.expectPeekToken(token.COLON) {
+			return nil
+		}
+
+		p.nextToken()
+		valueExpression := p.parseExpression(LOWEST)
+
+		expression.Pairs = append(expression.Pairs, ast.HashPair{
+			Key:   keyExpression,
+			Value: valueExpression,
+		})
+
+		if p.peekTokenIs(token.RIGHT_BRACE) {
+			continue
+		}
+
+		if !p.expectPeekToken(token.COMMA) {
+			return nil
+		}
+	}
+
+	if !p.expectPeekToken(token.RIGHT_BRACE) {
 		return nil
 	}
 

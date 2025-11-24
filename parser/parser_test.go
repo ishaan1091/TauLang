@@ -868,6 +868,180 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:           "success - hash literal 1",
+			input:          "{}",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+						Expression: &ast.HashLiteral{
+							Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+							Pairs: []ast.HashPair{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - hash literal 2",
+			input:          "{\"one\": 1, \"two\": 2, \"three\": 3, saccha: 4, jhootha: 5, 1: 7, 2: 8}",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+						Expression: &ast.HashLiteral{
+							Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+							Pairs: []ast.HashPair{
+								{
+									Key: &ast.String{
+										Token: token.Token{Type: token.STRING, Literal: "one"},
+										Value: "one",
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "1"},
+										Value: 1,
+									},
+								},
+								{
+									Key: &ast.String{
+										Token: token.Token{Type: token.STRING, Literal: "two"},
+										Value: "two",
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "2"},
+										Value: 2,
+									},
+								},
+								{
+									Key: &ast.String{
+										Token: token.Token{Type: token.STRING, Literal: "three"},
+										Value: "three",
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "3"},
+										Value: 3,
+									},
+								},
+								{
+									Key: &ast.Boolean{
+										Token: token.Token{Type: token.TRUE, Literal: "true"},
+										Value: true,
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "4"},
+										Value: 4,
+									},
+								},
+								{
+									Key: &ast.Boolean{
+										Token: token.Token{Type: token.FALSE, Literal: "false"},
+										Value: false,
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "5"},
+										Value: 5,
+									},
+								},
+								{
+									Key: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "1"},
+										Value: 1,
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "7"},
+										Value: 7,
+									},
+								},
+								{
+									Key: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "2"},
+										Value: 2,
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "8"},
+										Value: 8,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - hash literal 3",
+			input:          "{\"one\": 0 + 1, \"two\": 10, \"thr\" + \"ee\": 15 / 5}",
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.ExpressionStatement{
+						Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+						Expression: &ast.HashLiteral{
+							Token: token.Token{Type: token.LEFT_BRACE, Literal: "{"},
+							Pairs: []ast.HashPair{
+								{
+									Key: &ast.String{
+										Token: token.Token{Type: token.STRING, Literal: "one"},
+										Value: "one",
+									},
+									Value: &ast.InfixExpression{
+										Token: token.Token{Type: token.ADDITION, Literal: "+"},
+										Left: &ast.IntegerLiteral{
+											Token: token.Token{Type: token.NUMBER, Literal: "0"},
+											Value: 0,
+										},
+										Operator: "+",
+										Right: &ast.IntegerLiteral{
+											Token: token.Token{Type: token.NUMBER, Literal: "1"},
+											Value: 1,
+										},
+									},
+								},
+								{
+									Key: &ast.String{
+										Token: token.Token{Type: token.STRING, Literal: "two"},
+										Value: "two",
+									},
+									Value: &ast.IntegerLiteral{
+										Token: token.Token{Type: token.NUMBER, Literal: "10"},
+										Value: 10,
+									},
+								},
+								{
+									Key: &ast.InfixExpression{
+										Token: token.Token{Type: token.ADDITION, Literal: "+"},
+										Left: &ast.String{
+											Token: token.Token{Type: token.STRING, Literal: "thr"},
+											Value: "thr",
+										},
+										Operator: "+",
+										Right: &ast.String{
+											Token: token.Token{Type: token.STRING, Literal: "ee"},
+											Value: "ee",
+										},
+									},
+									Value: &ast.InfixExpression{
+										Token: token.Token{Type: token.DIVISION, Literal: "/"},
+										Left: &ast.IntegerLiteral{
+											Token: token.Token{Type: token.NUMBER, Literal: "15"},
+											Value: 15,
+										},
+										Operator: "/",
+										Right: &ast.IntegerLiteral{
+											Token: token.Token{Type: token.NUMBER, Literal: "5"},
+											Value: 5,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
