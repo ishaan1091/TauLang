@@ -488,17 +488,16 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 -   Inspired by the wisdom and humor of Desi Tau
 -   Built following the principles from "Writing An Interpreter In Go" by Thorsten Ball
--   Thanks to all contributors and the open-source community
 
 ## 🌐 Website
 
-Visit the [TauLang website](https://ishaan1091.github.io/taulang) for an interactive experience with live examples, documentation, and more!
+Visit the [TauLang website](https://ishaan1091.github.io/TauLang/) for an interactive experience with live examples, documentation, and more!
 
 The website is automatically deployed to GitHub Pages whenever changes are pushed to the repository.
 
 ## 🔗 Links
 
--   [🌐 Website](https://ishaan1091.github.io/taulang) - Interactive landing page
+-   [🌐 Website](https://ishaan1091.github.io/TauLang/) - Interactive landing page
 -   [Documentation](#-language-documentation)
 -   [Examples](#-example-programs)
 -   [GitHub Repository](https://github.com/ishaan1091/taulang)

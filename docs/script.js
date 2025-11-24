@@ -116,12 +116,41 @@ function highlightCode() {
     const codeBlocks = document.querySelectorAll("code.language-tau");
 
     codeBlocks.forEach((block) => {
-        let code = block.textContent;
+        // Skip if already highlighted
+        if (block.dataset.highlighted === "true") {
+            return;
+        }
 
-        // Highlight comments
-        code = code.replace(/\/\/.*$/gm, '<span class="comment">$&</span>');
+        // Get original text content (before any HTML)
+        // If already has HTML, extract text content
+        let code = block.textContent || block.innerText;
 
-        // Highlight keywords
+        // Escape HTML first
+        const escapeHtml = (text) => {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        };
+
+        code = escapeHtml(code);
+
+        // Process in correct order to avoid conflicts
+        // 1. First, protect strings by replacing them with placeholders
+        const stringPlaceholders = [];
+        code = code.replace(/"([^"]*)"/g, (match, content) => {
+            const placeholder = `__STRING_${stringPlaceholders.length}__`;
+            stringPlaceholders.push(
+                `<span class="code-string">"${escapeHtml(content)}"</span>`
+            );
+            return placeholder;
+        });
+
+        // 2. Highlight comments
+        code = code.replace(/\/\/.*$/gm, (match) => {
+            return `<span class="code-comment">${match}</span>`;
+        });
+
+        // 3. Highlight keywords
         const keywords = [
             "sun_liyo_tau",
             "tau_ka_jugaad",
@@ -137,35 +166,103 @@ function highlightCode() {
         ];
 
         keywords.forEach((keyword) => {
-            const regex = new RegExp(`\\b${keyword}\\b`, "g");
+            // Use word boundaries, but avoid matching inside placeholders or HTML tags
+            const regex = new RegExp(
+                `\\b${keyword}\\b(?![^_]*__)(?![^<]*>)`,
+                "g"
+            );
             code = code.replace(
                 regex,
-                `<span style="color: #f59e0b; font-weight: 600;">${keyword}</span>`
+                `<span class="code-keyword">${keyword}</span>`
             );
         });
 
-        // Highlight strings
+        // 4. Highlight numbers (avoid matching inside placeholders or HTML tags)
         code = code.replace(
-            /"([^"]*)"/g,
-            '<span style="color: #10b981;">"$1"</span>'
+            /\b(\d+)\b(?![^_]*__)(?![^<]*>)/g,
+            '<span class="code-number">$1</span>'
         );
 
-        // Highlight numbers
-        code = code.replace(
-            /\b(\d+)\b/g,
-            '<span style="color: #3b82f6;">$1</span>'
-        );
+        // 5. Restore strings
+        stringPlaceholders.forEach((placeholder, index) => {
+            code = code.replace(`__STRING_${index}__`, placeholder);
+        });
 
+        // Now apply our highlighting
         block.innerHTML = code;
+        block.dataset.highlighted = "true";
     });
 }
 
-// Run highlighting after page load
-document.addEventListener("DOMContentLoaded", highlightCode);
+// Dark mode functionality
+function initDarkMode() {
+    const darkModeToggle = document.getElementById("dark-mode-toggle");
+    const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+    ).matches;
+    const savedTheme = localStorage.getItem("theme");
 
-// Re-highlight when tabs change
+    // Determine initial theme
+    let isDark = savedTheme === "dark" || (!savedTheme && prefersDark);
+
+    function applyTheme(dark) {
+        document.documentElement.classList.toggle("dark-mode", dark);
+        if (darkModeToggle) {
+            darkModeToggle.textContent = dark ? "☀️" : "🌙";
+            darkModeToggle.setAttribute(
+                "aria-label",
+                dark ? "Switch to light mode" : "Switch to dark mode"
+            );
+        }
+        localStorage.setItem("theme", dark ? "dark" : "light");
+    }
+
+    // Apply initial theme
+    applyTheme(isDark);
+
+    // Toggle on button click
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("click", () => {
+            isDark = !isDark;
+            applyTheme(isDark);
+        });
+    }
+
+    // Listen for system theme changes
+    window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", (e) => {
+            if (!localStorage.getItem("theme")) {
+                applyTheme(e.matches);
+            }
+        });
+}
+
+// Run highlighting after page load
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(highlightCode, 100);
+    initDarkMode();
+});
+
+// Re-highlight when tabs change (reset first)
 tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
-        setTimeout(highlightCode, 100);
+        // Reset highlighted state for code blocks in the new tab
+        setTimeout(() => {
+            const activeExample = document.querySelector(
+                ".code-example.active"
+            );
+            if (activeExample) {
+                const codeBlock =
+                    activeExample.querySelector("code.language-tau");
+                if (codeBlock && codeBlock.dataset.highlighted === "true") {
+                    // Get the original text before highlighting
+                    const originalText = codeBlock.textContent;
+                    codeBlock.dataset.highlighted = "false";
+                    codeBlock.textContent = originalText;
+                    highlightCode();
+                }
+            }
+        }, 150);
     });
 });
