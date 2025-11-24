@@ -727,6 +727,51 @@ func TestEvaluator(t *testing.T) {
 			input:          `{rasoi_mein_bata_diye(x) { x; }: 5}`,
 			expectedObject: &object.Error{Message: "unusable as hash key: FUNCTION"},
 		},
+		{
+			name: "success - hash index assignment",
+			input: `sun_liyo_tau map ne_bana_diye {"one": 1, "two": 2};
+			map["three"] ne_bana_diye 3;
+			map["three"];`,
+			expectedObject: &object.Integer{Value: 3},
+		},
+		{
+			name: "success - hash index assignment - overwrite",
+			input: `sun_liyo_tau map ne_bana_diye {"one": 1, "two": 2};
+			map["one"] ne_bana_diye 10;
+			map["one"];`,
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name: "success - array index assignment",
+			input: `sun_liyo_tau arr ne_bana_diye [1, 2, 3];
+			arr[1] ne_bana_diye 20;
+			arr[1];`,
+			expectedObject: &object.Integer{Value: 20},
+		},
+		{
+			name: "success - array index assignment - extend",
+			input: `sun_liyo_tau arr ne_bana_diye [1, 2];
+			arr[5] ne_bana_diye 10;
+			arr[5];`,
+			expectedObject: &object.Integer{Value: 10},
+		},
+		{
+			name: "success - array index assignment - verify other elements",
+			input: `sun_liyo_tau arr ne_bana_diye [1, 2];
+			arr[5] ne_bana_diye 10;
+			arr[0];`,
+			expectedObject: &object.Integer{Value: 1},
+		},
+		{
+			name:           "failure - index assignment on undefined variable",
+			input:          `map["key"] ne_bana_diye 1;`,
+			expectedObject: &object.Error{Message: "identifier not found: map"},
+		},
+		{
+			name:           "failure - index assignment on non-indexable type",
+			input:          `sun_liyo_tau x ne_bana_diye 5; x[0] ne_bana_diye 1;`,
+			expectedObject: &object.Error{Message: "index assignment not supported for type: INTEGER"},
+		},
 	}
 
 	for _, tc := range tests {

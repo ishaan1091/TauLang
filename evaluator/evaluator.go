@@ -46,6 +46,8 @@ func Eval(node ast.Node, env object.Environment) object.Object {
 		return evalCallExpression(node.Function, node.Arguments, env)
 	case *ast.AssignmentStatement:
 		return evalAssignmentStatement(node.Name, node.Value, env)
+	case *ast.IndexAssignmentStatement:
+		return evalIndexAssignmentStatement(node, env)
 	case *ast.WhileLoopExpression:
 		return evalWhileLoopExpression(node.Condition, node.Body, env)
 	case *ast.BreakStatement:
@@ -345,6 +347,78 @@ func evalAssignmentStatement(name *ast.Identifier, value ast.Expression, env obj
 	}
 
 	env.Set(name.Value, evaluatedValue)
+
+	return NULL
+}
+
+func evalIndexAssignmentStatement(node *ast.IndexAssignmentStatement, env object.Environment) object.Object {
+	identifier, ok := node.IndexedExpression.(*ast.Identifier)
+	if !ok {
+		return newError("index assignment only supported for identifiers, got: %s", node.IndexedExpression.String())
+	}
+
+	indexedObject, ok := env.Get(identifier.Value)
+	if !ok {
+		return newError("identifier not found: %s", identifier.Value)
+	}
+
+	evaluatedIndex := Eval(node.Index, env)
+	if isError(evaluatedIndex) {
+		return evaluatedIndex
+	}
+
+	evaluatedValue := Eval(node.Value, env)
+	if isError(evaluatedValue) {
+		return evaluatedValue
+	}
+
+	switch obj := indexedObject.(type) {
+	case *object.Array:
+		return evalArrayIndexAssignment(identifier.Value, obj, evaluatedIndex, evaluatedValue, env)
+	case *object.HashMap:
+		return evalHashIndexAssignment(identifier.Value, obj, evaluatedIndex, evaluatedValue, env)
+	default:
+		return newError("index assignment not supported for type: %s", indexedObject.Type())
+	}
+}
+
+func evalArrayIndexAssignment(name string, array *object.Array, index object.Object, value object.Object, env object.Environment) object.Object {
+	indexInt, ok := index.(*object.Integer)
+	if !ok {
+		return newError("array index must be an integer, got: %s", index.Type())
+	}
+
+	indexVal := indexInt.Value
+	if indexVal < 0 {
+		return newError("array index out of bounds: %d", indexVal)
+	}
+
+	// Extend array if necessary
+	if indexVal >= int64(len(array.Elements)) {
+		// Extend the array with NULL values
+		for int64(len(array.Elements)) <= indexVal {
+			array.Elements = append(array.Elements, NULL)
+		}
+	}
+
+	array.Elements[indexVal] = value
+
+	// Store the modified array back in the environment
+	env.Set(name, array)
+
+	return NULL
+}
+
+func evalHashIndexAssignment(name string, hashMap *object.HashMap, index object.Object, value object.Object, env object.Environment) object.Object {
+	hashKey, ok := index.(object.Hashable)
+	if !ok {
+		return newError("unusable as hash key: %s", index.Type())
+	}
+
+	hashMap.Pairs[hashKey.Hash()] = object.HashPair{Key: index, Value: value}
+
+	// Store the modified hashmap back in the environment
+	env.Set(name, hashMap)
 
 	return NULL
 }

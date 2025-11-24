@@ -254,10 +254,38 @@ func (p *parser) parseAssignmentStatement() ast.Statement {
 	return &statement
 }
 
+func (p *parser) parseIndexAssignmentStatement(indexExpr *ast.IndexExpression) ast.Statement {
+	statement := ast.IndexAssignmentStatement{
+		Token:             indexExpr.Token,
+		IndexedExpression: indexExpr.IndexedExpression,
+		Index:             indexExpr.Index,
+	}
+
+	if !p.expectPeekToken(token.ASSIGNMENT) {
+		return nil
+	}
+
+	p.nextToken()
+	statement.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return &statement
+}
+
 func (p *parser) parseExpressionStatement() ast.Statement {
 	statement := ast.ExpressionStatement{Token: p.currToken}
 
-	statement.Expression = p.parseExpression(LOWEST)
+	expression := p.parseExpression(LOWEST)
+
+	// Check if this is an index assignment: map["a"] = 1
+	if indexExpr, ok := expression.(*ast.IndexExpression); ok && p.peekTokenIs(token.ASSIGNMENT) {
+		return p.parseIndexAssignmentStatement(indexExpr)
+	}
+
+	statement.Expression = expression
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()

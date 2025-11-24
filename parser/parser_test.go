@@ -1042,6 +1042,86 @@ func TestParser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:           "success - index assignment statement - hash",
+			input:          `map["key"] ne_bana_diye 1;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.IndexAssignmentStatement{
+						Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+						IndexedExpression: &ast.Identifier{
+							Token: token.Token{Type: token.IDENTIFIER, Literal: "map"},
+							Value: "map",
+						},
+						Index: &ast.String{
+							Token: token.Token{Type: token.STRING, Literal: "key"},
+							Value: "key",
+						},
+						Value: &ast.IntegerLiteral{
+							Token: token.Token{Type: token.NUMBER, Literal: "1"},
+							Value: 1,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - index assignment statement - array",
+			input:          `arr[0] ne_bana_diye 10;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.IndexAssignmentStatement{
+						Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+						IndexedExpression: &ast.Identifier{
+							Token: token.Token{Type: token.IDENTIFIER, Literal: "arr"},
+							Value: "arr",
+						},
+						Index: &ast.IntegerLiteral{
+							Token: token.Token{Type: token.NUMBER, Literal: "0"},
+							Value: 0,
+						},
+						Value: &ast.IntegerLiteral{
+							Token: token.Token{Type: token.NUMBER, Literal: "10"},
+							Value: 10,
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "success - index assignment statement - expression index",
+			input:          `map["a" + "b"] ne_bana_diye 5;`,
+			expectedErrors: []string{},
+			expectedProgram: &ast.Program{
+				Statements: []ast.Statement{
+					&ast.IndexAssignmentStatement{
+						Token: token.Token{Type: token.LEFT_BRACKET, Literal: "["},
+						IndexedExpression: &ast.Identifier{
+							Token: token.Token{Type: token.IDENTIFIER, Literal: "map"},
+							Value: "map",
+						},
+						Index: &ast.InfixExpression{
+							Token: token.Token{Type: token.ADDITION, Literal: "+"},
+							Left: &ast.String{
+								Token: token.Token{Type: token.STRING, Literal: "a"},
+								Value: "a",
+							},
+							Operator: "+",
+							Right: &ast.String{
+								Token: token.Token{Type: token.STRING, Literal: "b"},
+								Value: "b",
+							},
+						},
+						Value: &ast.IntegerLiteral{
+							Token: token.Token{Type: token.NUMBER, Literal: "5"},
+							Value: 5,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
