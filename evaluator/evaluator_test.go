@@ -551,6 +551,11 @@ func TestEvaluator(t *testing.T) {
 			expectedObject: &object.Integer{Value: 3},
 		},
 		{
+			name:           "success - builtin function - len - hashmap",
+			input:          "len({\"one\":1, 2: 2, saccha: 3});",
+			expectedObject: &object.Integer{Value: 3},
+		},
+		{
 			name:  "success - array literal",
 			input: "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }]",
 			expectedObject: &object.Array{
