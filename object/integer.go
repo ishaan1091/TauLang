@@ -13,3 +13,7 @@ func (i *Integer) Type() Type {
 func (i *Integer) Inspect() string {
 	return fmt.Sprintf("%d", i.Value)
 }
+
+func (i *Integer) Hash() HashKey {
+	return HashKey{ObjectType: INTEGER_OBJ, Value: uint64(i.Value)}
+}

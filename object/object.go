@@ -14,9 +14,20 @@ const (
 	CONTINUE_OBJ     = "CONTINUE"
 	BUILTIN_OBJ      = "BUILTIN"
 	ARRAY_OBJ        = "ARRAY"
+	HASHMAP_OBJ      = "HASHMAP"
 )
 
 type Object interface {
 	Type() Type
 	Inspect() string
+}
+
+type HashKey struct {
+	ObjectType Type
+	Value      uint64
+}
+
+// Hashable objects can be used as keys in hashmap
+type Hashable interface {
+	Hash() HashKey
 }

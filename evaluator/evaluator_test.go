@@ -637,6 +637,46 @@ func TestEvaluator(t *testing.T) {
 			input:          "last(push([1, 2, 3], 4))",
 			expectedObject: &object.Integer{Value: 4},
 		},
+		{
+			name: "success - hashmap",
+			input: `sun_liyo_tau two ne_bana_diye "two";
+			{
+				"one": 10 - 9,
+				two: 1 + 1,
+				"thr" + "ee": 6 / 2,
+				4: 4,
+				saccha: 5,
+				jhootha: 6
+			}`,
+			expectedObject: &object.HashMap{
+				Pairs: map[object.HashKey]object.HashPair{
+					(&object.String{Value: "one"}).Hash(): {
+						Key:   &object.String{Value: "one"},
+						Value: &object.Integer{Value: 1},
+					},
+					(&object.String{Value: "two"}).Hash(): {
+						Key:   &object.String{Value: "two"},
+						Value: &object.Integer{Value: 2},
+					},
+					(&object.String{Value: "three"}).Hash(): {
+						Key:   &object.String{Value: "three"},
+						Value: &object.Integer{Value: 3},
+					},
+					(&object.Integer{Value: 4}).Hash(): {
+						Key:   &object.Integer{Value: 4},
+						Value: &object.Integer{Value: 4},
+					},
+					evaluator.TRUE.Hash(): {
+						Key:   &object.Boolean{Value: true},
+						Value: &object.Integer{Value: 5},
+					},
+					evaluator.FALSE.Hash(): {
+						Key:   &object.Boolean{Value: false},
+						Value: &object.Integer{Value: 6},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
