@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TauLang - A fully-featured programming language interpreter with Desi Tau humor">
+    <title>TauLang - Desi Tau Programming Language</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-emoji">👳🏾‍♂️</span>
+                    <span class="logo-text">TauLang</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="#docs">Docs</a></li>
+                    <li><a href="#get-started">Get Started</a></li>
+                    <li><a href="https://github.com/ishaan1091/taulang" target="_blank" class="github-link">GitHub</a>
+                    </li>
+                </ul>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="quote">"Sun liyo tau…</span><br>
+                    programming bhi ab apne hisaab se hogi."
+                </h1>
+                <p class="hero-subtitle">
+                    TauLang is a fully-featured programming language interpreter with the wisdom and humor of Desi Tau.
+                    It looks funny, but it's a <strong>real, working interpreter</strong> with modern features.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#get-started" class="btn btn-primary">Get Started</a>
+                    <a href="#examples" class="btn btn-secondary">See Examples</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Real Interpreter</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Desi Tau Wisdom</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">Go</div>
+                        <div class="stat-label">Written In</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Language Features</h2>
+            <p class="section-subtitle">Everything you need for real programming, with a Desi Tau twist</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔤</div>
+                    <h3>Data Types</h3>
+                    <p>Integers, booleans, strings, arrays, and hash maps with full type support</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Control Flow</h3>
+                    <p>If/else statements, while loops, break, and continue for complete program control</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Functions</h3>
+                    <p>First-class functions, closures, and higher-order functions with lexical scoping</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Collections</h3>
+                    <p>Arrays and hash maps with indexing, assignment, and built-in manipulation functions</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛠️</div>
+                    <h3>Built-ins</h3>
+                    <p>Useful built-in functions like len(), first(), last(), and push() for common operations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h3>REPL</h3>
+                    <p>Interactive Read-Eval-Print Loop for quick testing and experimentation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Example Section -->
+    <section id="examples" class="examples">
+        <div class="container">
+            <h2 class="section-title">Example Code</h2>
+            <p class="section-subtitle">See TauLang in action with real examples</p>
+
+            <div class="example-tabs">
+                <button class="tab-btn active" data-tab="basic">Basic</button>
+                <button class="tab-btn" data-tab="functions">Functions</button>
+                <button class="tab-btn" data-tab="collections">Collections</button>
+                <button class="tab-btn" data-tab="advanced">Advanced</button>
+            </div>
+
+            <div class="code-examples">
+                <div class="code-example active" id="basic-example">
+                    <div class="code-header">
+                        <span>Basic Operations</span>
+                        <button class="copy-btn" data-code="basic">Copy</button>
+                    </div>
+                    <pre><code class="language-tau">// Variables and arithmetic
+sun_liyo_tau x ne_bana_diye 10;
+sun_liyo_tau y ne_bana_diye 20;
+sun_liyo_tau sum ne_bana_diye x + y;
+
+// Conditionals
+agar_maan_lo (sum > 25) {
+    laadle_ye_le "Greater than 25";
+} na_toh {
+    laadle_ye_le "Less than or equal to 25";
+}
+
+// While loops
+sun_liyo_tau i ne_bana_diye 0;
+jab_tak (i < 5) {
+    i ne_bana_diye i + 1;
+}</code></pre>
+                </div>
+
+                <div class="code-example" id="functions-example">
+                    <div class="code-header">
+                        <span>Functions and Closures</span>
+                        <button class="copy-btn" data-code="functions">Copy</button>
+                    </div>
+                    <pre><code class="language-tau">// Function definition
+sun_liyo_tau add ne_bana_diye tau_ka_jugaad(a, b) {
+    laadle_ye_le a + b;
+};
+
+add(5, 3);  // Returns 8
+
+// Higher-order functions
+sun_liyo_tau apply ne_bana_diye tau_ka_jugaad(fn, x) {
+    laadle_ye_le fn(x);
+};
+
+// Closures
+sun_liyo_tau makeCounter ne_bana_diye tau_ka_jugaad() {
+    sun_liyo_tau count ne_bana_diye 0;
+    laadle_ye_le tau_ka_jugaad() {
+        count ne_bana_diye count + 1;
+        laadle_ye_le count;
+    };
+};
+
+sun_liyo_tau counter ne_bana_diye makeCounter();
+counter();  // Returns 1
+counter();  // Returns 2</code></pre>
+                </div>
+
+                <div class="code-example" id="collections-example">
+                    <div class="code-header">
+                        <span>Arrays and Hash Maps</span>
+                        <button class="copy-btn" data-code="collections">Copy</button>
+                    </div>
+                    <pre><code class="language-tau">// Arrays
+sun_liyo_tau arr ne_bana_diye [1, 2, 3, 4, 5];
+arr[0];              // Returns 1
+arr[2] ne_bana_diye 10;  // Modify element
+len(arr);            // Returns 5
+first(arr);          // Returns 1
+last(arr);           // Returns 5
+
+// Hash maps
+sun_liyo_tau person ne_bana_diye {
+    "name": "Tau",
+    "age": 50,
+    "city": "Mumbai"
+};
+
+person["name"];              // Returns "Tau"
+person["country"] ne_bana_diye "India";  // Add new key
+person["age"] ne_bana_diye 51;           // Update key</code></pre>
+                </div>
+
+                <div class="code-example" id="advanced-example">
+                    <div class="code-header">
+                        <span>Recursive Functions</span>
+                        <button class="copy-btn" data-code="advanced">Copy</button>
+                    </div>
+                    <pre><code class="language-tau">// Factorial
+sun_liyo_tau factorial ne_bana_diye tau_ka_jugaad(n) {
+    agar_maan_lo (n <= 1) {
+        laadle_ye_le 1;
+    } na_toh {
+        laadle_ye_le n * factorial(n - 1);
+    }
+};
+
+factorial(5);  // Returns 120
+
+// Fibonacci
+sun_liyo_tau fibonacci ne_bana_diye tau_ka_jugaad(n) {
+    agar_maan_lo (n <= 1) {
+        laadle_ye_le n;
+    } na_toh {
+        laadle_ye_le fibonacci(n - 1) + fibonacci(n - 2);
+    }
+};
+
+fibonacci(10);  // Returns 55</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Keywords Section -->
+    <section id="docs" class="keywords">
+        <div class="container">
+            <h2 class="section-title">Language Keywords</h2>
+            <p class="section-subtitle">All the Desi Tau keywords you need to know</p>
+
+            <div class="keywords-grid">
+                <div class="keyword-card">
+                    <code>sun_liyo_tau</code>
+                    <span class="keyword-en">let</span>
+                    <p>Variable declaration</p>
+                </div>
+                <div class="keyword-card">
+                    <code>tau_ka_jugaad</code>
+                    <span class="keyword-en">func</span>
+                    <p>Function definition</p>
+                </div>
+                <div class="keyword-card">
+                    <code>agar_maan_lo</code>
+                    <span class="keyword-en">if</span>
+                    <p>Conditional statement</p>
+                </div>
+                <div class="keyword-card">
+                    <code>na_toh</code>
+                    <span class="keyword-en">else</span>
+                    <p>Else clause</p>
+                </div>
+                <div class="keyword-card">
+                    <code>laadle_ye_le</code>
+                    <span class="keyword-en">return</span>
+                    <p>Return statement</p>
+                </div>
+                <div class="keyword-card">
+                    <code>jab_tak</code>
+                    <span class="keyword-en">while</span>
+                    <p>While loop</p>
+                </div>
+                <div class="keyword-card">
+                    <code>rok_diye</code>
+                    <span class="keyword-en">break</span>
+                    <p>Break statement</p>
+                </div>
+                <div class="keyword-card">
+                    <code>jaan_de</code>
+                    <span class="keyword-en">continue</span>
+                    <p>Continue statement</p>
+                </div>
+                <div class="keyword-card">
+                    <code>ne_bana_diye</code>
+                    <span class="keyword-en">=</span>
+                    <p>Assignment operator</p>
+                </div>
+                <div class="keyword-card">
+                    <code>saccha</code>
+                    <span class="keyword-en">true</span>
+                    <p>Boolean true</p>
+                </div>
+                <div class="keyword-card">
+                    <code>jhootha</code>
+                    <span class="keyword-en">false</span>
+                    <p>Boolean false</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get Started Section -->
+    <section id="get-started" class="get-started">
+        <div class="container">
+            <h2 class="section-title">Get Started</h2>
+            <p class="section-subtitle">Install and start coding in TauLang today</p>
+
+            <div class="install-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Clone the Repository</h3>
+                    <pre><code>git clone https://github.com/ishaan1091/taulang.git
+cd taulang</code></pre>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Build the Interpreter</h3>
+                    <pre><code>make build</code></pre>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Start Coding</h3>
+                    <pre><code># Run REPL
+./bin/taulang
+
+# Or execute a file
+./bin/taulang program.tau</code></pre>
+                </div>
+            </div>
+
+            <div class="requirements">
+                <h3>Requirements</h3>
+                <ul>
+                    <li>Go 1.21 or higher</li>
+                    <li>Make (optional, for Makefile commands)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TauLang</h3>
+                    <p>Made with ❤️ and lots of "Sun liyo tau"</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#examples">Examples</a></li>
+                        <li><a href="#docs">Documentation</a></li>
+                        <li><a href="https://github.com/ishaan1091/taulang">GitHub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/ishaan1091/taulang/issues">Issues</a></li>
+                        <li><a href="https://github.com/ishaan1091/taulang/pulls">Pull Requests</a></li>
+                        <li><a href="https://github.com/ishaan1091/taulang/blob/main/LICENSE">License</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TauLang. Licensed under MIT.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
