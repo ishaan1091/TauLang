@@ -623,9 +623,49 @@ func TestEvaluator(t *testing.T) {
 			expectedObject: &object.Null{},
 		},
 		{
-			name:           "failure - index expression",
+			name:           "success - index expression - hashmap 1",
+			input:          `{"foo": 5}["foo"]`,
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name:           "success - index expression - hashmap 2",
+			input:          `{"foo": 5}["bar"]`,
+			expectedObject: &object.Null{},
+		},
+		{
+			name:           "success - index expression - hashmap 3",
+			input:          `sun_liyo_tau key ne_bana_diye "foo"; {"foo": 5}[key]`,
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name:           "success - index expression - hashmap 4",
+			input:          `{}["foo"]`,
+			expectedObject: &object.Null{},
+		},
+		{
+			name:           "success - index expression - hashmap 5",
+			input:          `{5: 5}[5]`,
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name:           "success - index expression - hashmap 6",
+			input:          `{saccha: 5}[saccha]`,
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name:           "success - index expression - hashmap 7",
+			input:          `{jhootha: 5}[jhootha]`,
+			expectedObject: &object.Integer{Value: 5},
+		},
+		{
+			name:           "failure - index expression - array",
 			input:          "[1, 2, 3][saccha]",
 			expectedObject: &object.Error{Message: "index operator not supported: ARRAY[BOOLEAN]"},
+		},
+		{
+			name:           "failure - index expression - hashmap",
+			input:          "{1: 5}[rasoi_mein_bata_diye(x) {x}]",
+			expectedObject: &object.Error{Message: "unusable as hash key: FUNCTION"},
 		},
 		{
 			name:           "success - builtin function - first",
@@ -681,6 +721,11 @@ func TestEvaluator(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			name:           "failure - hashmap",
+			input:          `{rasoi_mein_bata_diye(x) { x; }: 5}`,
+			expectedObject: &object.Error{Message: "unusable as hash key: FUNCTION"},
 		},
 	}
 
