@@ -27,7 +27,7 @@ agar_maan_lo (x > 0) {
     laadle_ye_le 0;
 }
 
-sun_liyo_tau add ne_bana_diye rasoi_mein_bata_diye(y, z) {
+sun_liyo_tau add ne_bana_diye tau_ka_jugaad(y, z) {
     laadle_ye_le y + z;
 };
 

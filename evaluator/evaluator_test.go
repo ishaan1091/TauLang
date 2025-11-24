@@ -346,7 +346,7 @@ func TestEvaluator(t *testing.T) {
 		},
 		{
 			name:  "success - function definition",
-			input: "rasoi_mein_bata_diye(x) { x + 2; };",
+			input: "tau_ka_jugaad(x) { x + 2; };",
 			expectedObject: &object.Function{
 				Params: []*ast.Identifier{
 					{
@@ -379,12 +379,12 @@ func TestEvaluator(t *testing.T) {
 		},
 		{
 			name:           "success - call expression 1",
-			input:          "sun_liyo_tau add ne_bana_diye rasoi_mein_bata_diye(x, y) { x + y; }; add(5 + 5, add(5, 5));",
+			input:          "sun_liyo_tau add ne_bana_diye tau_ka_jugaad(x, y) { x + y; }; add(5 + 5, add(5, 5));",
 			expectedObject: &object.Integer{Value: 20},
 		},
 		{
 			name:           "success - call expression 2",
-			input:          "rasoi_mein_bata_diye(x) { x; }(5)",
+			input:          "tau_ka_jugaad(x) { x; }(5)",
 			expectedObject: &object.Integer{Value: 5},
 		},
 		{
@@ -394,7 +394,7 @@ func TestEvaluator(t *testing.T) {
 			sun_liyo_tau second ne_bana_diye 10;
 			sun_liyo_tau third ne_bana_diye 10;
 			
-			sun_liyo_tau ourFunction ne_bana_diye rasoi_mein_bata_diye(first) {
+			sun_liyo_tau ourFunction ne_bana_diye tau_ka_jugaad(first) {
 			  sun_liyo_tau second ne_bana_diye 20;
 			
 			  first + second + third;
@@ -417,7 +417,7 @@ func TestEvaluator(t *testing.T) {
 		{
 			name: "success - assignment statement 2",
 			input: `
-			sun_liyo_tau fn ne_bana_diye rasoi_mein_bata_diye() { 
+			sun_liyo_tau fn ne_bana_diye tau_ka_jugaad() { 
 				laadle_ye_le 12; 
 			}; 
 			sun_liyo_tau x ne_bana_diye 65;
@@ -430,7 +430,7 @@ func TestEvaluator(t *testing.T) {
 		{
 			name: "success - while loop expression 1",
 			input: `
-			sun_liyo_tau fn ne_bana_diye rasoi_mein_bata_diye() { 
+			sun_liyo_tau fn ne_bana_diye tau_ka_jugaad() { 
 				laadle_ye_le 12; 
 			}; 
 			sun_liyo_tau x ne_bana_diye 65;
@@ -446,7 +446,7 @@ func TestEvaluator(t *testing.T) {
 		{
 			name: "success - while loop expression 2",
 			input: `
-			sun_liyo_tau power ne_bana_diye rasoi_mein_bata_diye(x, n) { 
+			sun_liyo_tau power ne_bana_diye tau_ka_jugaad(x, n) { 
 				sun_liyo_tau i ne_bana_diye 0;
 				sun_liyo_tau result ne_bana_diye 1;
 				jab_tak (i < n) {
@@ -462,7 +462,7 @@ func TestEvaluator(t *testing.T) {
 		{
 			name: "success - while loop expression - break statement 1",
 			input: `
-			sun_liyo_tau incr ne_bana_diye rasoi_mein_bata_diye(n) { 
+			sun_liyo_tau incr ne_bana_diye tau_ka_jugaad(n) { 
 				sun_liyo_tau i ne_bana_diye 0;
 				jab_tak (i) {
 					i ne_bana_diye i + 1
@@ -480,7 +480,7 @@ func TestEvaluator(t *testing.T) {
 		{
 			name: "success - while loop expression - break statement 2",
 			input: `
-			sun_liyo_tau power ne_bana_diye rasoi_mein_bata_diye(x, n) { 
+			sun_liyo_tau power ne_bana_diye tau_ka_jugaad(x, n) { 
 				sun_liyo_tau i ne_bana_diye 0;
 				sun_liyo_tau result ne_bana_diye 1;
 				jab_tak (i) {
@@ -509,7 +509,7 @@ func TestEvaluator(t *testing.T) {
 		{
 			name: "success - while loop expression - continue statement",
 			input: `
-			sun_liyo_tau rangeSum ne_bana_diye rasoi_mein_bata_diye(l, r) { 
+			sun_liyo_tau rangeSum ne_bana_diye tau_ka_jugaad(l, r) { 
 				sun_liyo_tau i ne_bana_diye 0;
 				sun_liyo_tau result ne_bana_diye 0;
 				jab_tak (i <= r) {
@@ -557,7 +557,7 @@ func TestEvaluator(t *testing.T) {
 		},
 		{
 			name:  "success - array literal",
-			input: "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }]",
+			input: "[3, \"hello\", saccha, tau_ka_jugaad(x) { x + 2; }]",
 			expectedObject: &object.Array{
 				Elements: []object.Object{
 					&object.Integer{Value: 3},
@@ -664,7 +664,7 @@ func TestEvaluator(t *testing.T) {
 		},
 		{
 			name:           "failure - index expression - hashmap",
-			input:          "{1: 5}[rasoi_mein_bata_diye(x) {x}]",
+			input:          "{1: 5}[tau_ka_jugaad(x) {x}]",
 			expectedObject: &object.Error{Message: "unusable as hash key: FUNCTION"},
 		},
 		{
@@ -724,7 +724,7 @@ func TestEvaluator(t *testing.T) {
 		},
 		{
 			name:           "failure - hashmap",
-			input:          `{rasoi_mein_bata_diye(x) { x; }: 5}`,
+			input:          `{tau_ka_jugaad(x) { x; }: 5}`,
 			expectedObject: &object.Error{Message: "unusable as hash key: FUNCTION"},
 		},
 		{

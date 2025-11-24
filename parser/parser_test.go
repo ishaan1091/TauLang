@@ -151,7 +151,7 @@ func TestParser(t *testing.T) {
 		},
 		{
 			name:           "success - expression statement - function call 2",
-			input:          `some_func(rasoi_mein_bata_diye(x) { x + 2; });3;`,
+			input:          `some_func(tau_ka_jugaad(x) { x + 2; });3;`,
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
@@ -249,7 +249,7 @@ func TestParser(t *testing.T) {
 		{
 			name: "success - expression statement - function declaration 1",
 			input: `
-			sun_liyo_tau some_func ne_bana_diye rasoi_mein_bata_diye(x) {
+			sun_liyo_tau some_func ne_bana_diye tau_ka_jugaad(x) {
 				laadle_ye_le x
 			};
 			`,
@@ -285,7 +285,7 @@ func TestParser(t *testing.T) {
 			sun_liyo_tau second ne_bana_diye 10;
 			sun_liyo_tau third ne_bana_diye 10;
 			
-			sun_liyo_tau ourFunction ne_bana_diye rasoi_mein_bata_diye(first) {
+			sun_liyo_tau ourFunction ne_bana_diye tau_ka_jugaad(first) {
 			  sun_liyo_tau second ne_bana_diye 20;
 			
 			  first + second + third;
@@ -727,7 +727,7 @@ func TestParser(t *testing.T) {
 		},
 		{
 			name:           "success - parse array literal",
-			input:          "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }]",
+			input:          "[3, \"hello\", saccha, tau_ka_jugaad(x) { x + 2; }]",
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{
@@ -782,7 +782,7 @@ func TestParser(t *testing.T) {
 		},
 		{
 			name:           "success - index expression - array 1",
-			input:          "[3, \"hello\", saccha, rasoi_mein_bata_diye(x) { x + 2; }][some_func(x)]",
+			input:          "[3, \"hello\", saccha, tau_ka_jugaad(x) { x + 2; }][some_func(x)]",
 			expectedErrors: []string{},
 			expectedProgram: &ast.Program{
 				Statements: []ast.Statement{

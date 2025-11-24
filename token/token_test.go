@@ -21,7 +21,7 @@ func TestLookupIdentifier(t *testing.T) {
 		},
 		{
 			name:            "lookup FUNCTION keyword",
-			input:           "rasoi_mein_bata_diye",
+			input:           "tau_ka_jugaad",
 			expected:        FUNCTION,
 			expectedLiteral: "func",
 		},

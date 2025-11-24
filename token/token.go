@@ -58,17 +58,17 @@ type Token struct {
 }
 
 var Keywords = map[string]Type{
-	"sun_liyo_tau":         LET,
-	"rasoi_mein_bata_diye": FUNCTION,
-	"agar_maan_lo":         IF,
-	"na_toh":               ELSE,
-	"laadle_ye_le":         RETURN,
-	"saccha":               TRUE,
-	"jhootha":              FALSE,
-	"jab_tak":              WHILE,
-	"rok_diye":             BREAK,
-	"jaan_de":              CONTINUE,
-	"ne_bana_diye":         ASSIGNMENT,
+	"sun_liyo_tau":  LET,
+	"tau_ka_jugaad": FUNCTION,
+	"agar_maan_lo":  IF,
+	"na_toh":        ELSE,
+	"laadle_ye_le":  RETURN,
+	"saccha":        TRUE,
+	"jhootha":       FALSE,
+	"jab_tak":       WHILE,
+	"rok_diye":      BREAK,
+	"jaan_de":       CONTINUE,
+	"ne_bana_diye":  ASSIGNMENT,
 }
 
 var ReverseKeywords = map[Type]string{
