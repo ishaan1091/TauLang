@@ -55,6 +55,32 @@ func TestNewLexer(t *testing.T) {
 	}
 }
 
+func TestLexerSkipsSingleLineComments(t *testing.T) {
+	input := `
+// this is a comment
+sun_liyo_tau x ne_bana_diye 42; // inline comment
+x;
+// trailing comment`
+
+	expected := []token.Token{
+		{Type: token.LET, Literal: "let"},
+		{Type: token.IDENTIFIER, Literal: "x"},
+		{Type: token.ASSIGNMENT, Literal: "="},
+		{Type: token.NUMBER, Literal: "42"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.IDENTIFIER, Literal: "x"},
+		{Type: token.SEMICOLON, Literal: ";"},
+		{Type: token.EOF, Literal: ""},
+	}
+
+	l, err := NewLexer(input)
+	assert.NoError(t, err)
+
+	for _, tok := range expected {
+		assert.Equal(t, tok, l.NextToken())
+	}
+}
+
 func TestLexer(t *testing.T) {
 	tests := []struct {
 		name     string

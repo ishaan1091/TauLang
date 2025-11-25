@@ -86,7 +86,7 @@ func evalReturnStatement(returnValue ast.Expression, env object.Environment) obj
 }
 
 func evalProgram(statements []ast.Statement, env object.Environment) object.Object {
-	var result object.Object
+	var result object.Object = NULL
 	for _, s := range statements {
 		result = Eval(s, env)
 

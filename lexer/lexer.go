@@ -33,7 +33,7 @@ func NewLexer(input string) (Lexer, error) {
 		return nil, fmt.Errorf("failed to read first char: %w", err)
 	}
 
-	if err := l.skipWhiteSpaces(); err != nil {
+	if err := l.skipWhitespaceAndComments(); err != nil {
 		return nil, fmt.Errorf("failed to skip whitespaces during initialization: %w", err)
 	}
 
@@ -134,7 +134,7 @@ func (l *lexer) getNextToken() (token.Token, error) {
 		return token.Token{}, err
 	}
 
-	err = l.skipWhiteSpaces()
+	err = l.skipWhitespaceAndComments()
 	if err != nil {
 		return token.Token{}, err
 	}
@@ -157,12 +157,46 @@ func (l *lexer) readNextChar() error {
 	return nil
 }
 
-func (l *lexer) skipWhiteSpaces() error {
-	for unicode.IsSpace(l.currChar) {
+func (l *lexer) skipWhitespaceAndComments() error {
+	for {
+		advanced := false
+
+		for unicode.IsSpace(l.currChar) {
+			if err := l.readNextChar(); err != nil {
+				return err
+			}
+			advanced = true
+		}
+
+		if l.currChar == '/' {
+			if nextChar, _, err := l.decodeNextChar(); err == nil && nextChar == '/' {
+				if err := l.skipSingleLineComment(); err != nil {
+					return err
+				}
+				advanced = true
+				continue
+			}
+		}
+
+		if !advanced {
+			break
+		}
+	}
+
+	return nil
+}
+
+func (l *lexer) skipSingleLineComment() error {
+	for {
 		if err := l.readNextChar(); err != nil {
 			return err
 		}
+
+		if l.currChar == '\n' || l.currChar == '\r' || l.currChar == EOF {
+			break
+		}
 	}
+
 	return nil
 }
 

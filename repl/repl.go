@@ -60,5 +60,9 @@ func executeInputWithEnvironment(input string, logger *log.Logger, env object.En
 
 	output := evaluator.Eval(program, env)
 
-	logger.Println(output.Inspect())
+	if output == evaluator.NULL {
+		logger.Println("")
+	} else {
+		logger.Println(output.Inspect())
+	}
 }

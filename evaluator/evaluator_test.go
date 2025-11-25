@@ -772,6 +772,11 @@ func TestEvaluator(t *testing.T) {
 			input:          `sun_liyo_tau x ne_bana_diye 5; x[0] ne_bana_diye 1;`,
 			expectedObject: &object.Error{Message: "index assignment not supported for type: INTEGER"},
 		},
+		{
+			name:           "success - no executable code only comments",
+			input:          `// sun_liyo_tau x ne_bana_diye 5; x[0] ne_bana_diye 1;`,
+			expectedObject: &object.Null{},
+		},
 	}
 
 	for _, tc := range tests {
