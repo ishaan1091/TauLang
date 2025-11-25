@@ -1,10 +1,45 @@
 // Mobile menu toggle
 const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
 const navLinks = document.querySelector(".nav-links");
+const bodyElement = document.body;
 
-if (mobileMenuToggle) {
+const closeMobileMenu = () => {
+    if (navLinks && navLinks.classList.contains("active")) {
+        navLinks.classList.remove("active");
+    }
+    bodyElement.classList.remove("menu-open");
+    if (mobileMenuToggle) {
+        mobileMenuToggle.setAttribute("aria-expanded", "false");
+    }
+};
+
+if (mobileMenuToggle && navLinks) {
+    mobileMenuToggle.setAttribute("aria-expanded", "false");
     mobileMenuToggle.addEventListener("click", () => {
-        navLinks.classList.toggle("active");
+        const isActive = navLinks.classList.toggle("active");
+        bodyElement.classList.toggle("menu-open", isActive);
+        mobileMenuToggle.setAttribute(
+            "aria-expanded",
+            isActive ? "true" : "false"
+        );
+    });
+
+    navLinks.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+            closeMobileMenu();
+        });
+    });
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeMobileMenu();
+        }
     });
 }
 
@@ -79,10 +114,16 @@ const navbar = document.querySelector(".navbar");
 window.addEventListener("scroll", () => {
     const currentScroll = window.pageYOffset;
 
-    if (currentScroll > 100) {
-        navbar.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.1)";
-    } else {
-        navbar.style.boxShadow = "none";
+    if (navbar) {
+        if (currentScroll > 100) {
+            navbar.style.boxShadow = "0 2px 10px rgba(0, 0, 0, 0.1)";
+        } else {
+            navbar.style.boxShadow = "none";
+        }
+    }
+
+    if (navLinks && navLinks.classList.contains("active")) {
+        closeMobileMenu();
     }
 
     lastScroll = currentScroll;
@@ -163,6 +204,7 @@ function highlightCode() {
             "ne_bana_diye",
             "saccha",
             "jhootha",
+            "print",
         ];
 
         keywords.forEach((keyword) => {

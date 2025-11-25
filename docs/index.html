@@ -34,7 +34,7 @@
                     <li><button id="dark-mode-toggle" class="dark-mode-toggle"
                             aria-label="Switch to dark mode">🌙</button></li>
                 </ul>
-                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -110,7 +110,8 @@
                 <div class="feature-card">
                     <div class="feature-icon">🛠️</div>
                     <h3>Built-ins</h3>
-                    <p>Useful built-in functions like len(), first(), last(), and push() for common operations</p>
+                    <p>Useful built-in functions like len(), first(), last(), push(), and print() for common operations
+                    </p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">💻</div>
@@ -144,18 +145,20 @@
 sun_liyo_tau x ne_bana_diye 10;
 sun_liyo_tau y ne_bana_diye 20;
 sun_liyo_tau sum ne_bana_diye x + y;
+print(sum); // prints 30
 
 // Conditionals
 agar_maan_lo (sum > 25) {
-    laadle_ye_le "Greater than 25";
+    print("Greater than 25");
 } na_toh {
-    laadle_ye_le "Less than or equal to 25";
+    print("Less than or equal to 25");
 }
 
 // While loops
 sun_liyo_tau i ne_bana_diye 0;
 jab_tak (i < 5) {
     i ne_bana_diye i + 1;
+    print(i);
 }</code></pre>
                 </div>
 
@@ -169,7 +172,7 @@ sun_liyo_tau add ne_bana_diye tau_ka_jugaad(a, b) {
     laadle_ye_le a + b;
 };
 
-add(5, 3);  // Returns 8
+print(add(5, 3));  // prints 8
 
 // Higher-order functions
 sun_liyo_tau apply ne_bana_diye tau_ka_jugaad(fn, x) {
@@ -186,8 +189,8 @@ sun_liyo_tau makeCounter ne_bana_diye tau_ka_jugaad() {
 };
 
 sun_liyo_tau counter ne_bana_diye makeCounter();
-counter();  // Returns 1
-counter();  // Returns 2</code></pre>
+print(counter());  // prints 1
+print(counter());  // prints 2</code></pre>
                 </div>
 
                 <div class="code-example" id="collections-example">
@@ -197,11 +200,11 @@ counter();  // Returns 2</code></pre>
                     </div>
                     <pre><code class="language-tau">// Arrays
 sun_liyo_tau arr ne_bana_diye [1, 2, 3, 4, 5];
-arr[0];              // Returns 1
-arr[2] ne_bana_diye 10;  // Modify element
-len(arr);            // Returns 5
-first(arr);          // Returns 1
-last(arr);           // Returns 5
+print(arr[0]);              // prints 1
+arr[2] ne_bana_diye 10;     // Modify element
+print(len(arr));            // prints 5
+print(first(arr));          // prints 1
+print(last(arr));           // prints 5
 
 // Hash maps
 sun_liyo_tau person ne_bana_diye {
@@ -210,9 +213,9 @@ sun_liyo_tau person ne_bana_diye {
     "city": "Mumbai"
 };
 
-person["name"];              // Returns "Tau"
-person["country"] ne_bana_diye "India";  // Add new key
-person["age"] ne_bana_diye 51;           // Update key</code></pre>
+print(person["name"]);                    // prints "Tau"
+person["country"] ne_bana_diye "India";   // Add new key
+person["age"] ne_bana_diye 51;            // Update key</code></pre>
                 </div>
 
                 <div class="code-example" id="advanced-example">
@@ -229,7 +232,7 @@ sun_liyo_tau factorial ne_bana_diye tau_ka_jugaad(n) {
     }
 };
 
-factorial(5);  // Returns 120
+print(factorial(5));  // prints 120
 
 // Fibonacci
 sun_liyo_tau fibonacci ne_bana_diye tau_ka_jugaad(n) {
@@ -240,7 +243,7 @@ sun_liyo_tau fibonacci ne_bana_diye tau_ka_jugaad(n) {
     }
 };
 
-fibonacci(10);  // Returns 55</code></pre>
+print(fibonacci(10));  // prints 55</code></pre>
                 </div>
             </div>
         </div>
@@ -307,6 +310,11 @@ fibonacci(10);  // Returns 55</code></pre>
                     <code>jhootha</code>
                     <span class="keyword-en">false</span>
                     <p>Boolean false</p>
+                </div>
+                <div class="keyword-card">
+                    <code>// comment</code>
+                    <span class="keyword-en">comments</span>
+                    <p>Single-line notes ignored by TauLang</p>
                 </div>
             </div>
         </div>
